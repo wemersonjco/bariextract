@@ -9,6 +9,13 @@ export const extractPatientData = async (
   input: { text?: string, file?: { data: string, mimeType: string } },
   retryCount = 0
 ): Promise<Partial<PatientData>> => {
+  console.log('Iniciando extração de dados:', { 
+    hasText: !!input.text, 
+    hasFile: !!input.file, 
+    textLength: input.text?.length || 0,
+    fileType: input.file?.mimeType 
+  });
+
   const parts: any[] = [];
   
   if (input.file) {
@@ -24,9 +31,25 @@ export const extractPatientData = async (
     parts.push({ text: input.text });
   }
 
+  // Verificar se a chave da API está configurada
+  if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY.trim() === '') {
+    console.error('GEMINI_API_KEY não está configurada ou está vazia');
+    throw new Error('Chave da API Gemini não configurada. Verifique suas variáveis de ambiente.');
+  }
+
+  console.log('Chave da API configurada:', process.env.GEMINI_API_KEY ? 'Sim' : 'Não');
+
+  // Tentar com modelo principal ou fallback
+  const models = ["gemini-3.1-pro-preview", "gemini-1.5-pro"];
+  const modelToUse = models[Math.min(retryCount, models.length - 1)];
+  
+  console.log(`Usando modelo: ${modelToUse} (tentativa ${retryCount + 1})`);
+
   try {
+    console.log('Enviando requisição para Gemini API...');
+    
     const response = await ai.models.generateContent({
-      model: "gemini-3.1-pro-preview",
+      model: modelToUse,
       contents: {
         parts: [
           ...parts,
@@ -159,14 +182,19 @@ export const extractPatientData = async (
       },
     });
 
-    const rawData = response.text || "{}";
+    console.log('Resposta recebida da Gemini API:', response ? 'Sucesso' : 'Falha');
     
-    // Parse and validate the response
+    const rawData = response.text || "{}";
+    console.log('Dados brutos recebidos:', rawData.substring(0, 200) + '...');
+    
+    // Parse and validate response
     let parsedData;
     try {
       parsedData = JSON.parse(rawData);
+      console.log('JSON parseado com sucesso');
     } catch (parseError) {
       console.error("Failed to parse JSON response from Gemini:", parseError);
+      console.error("Raw response:", rawData);
       return {};
     }
 
@@ -201,6 +229,26 @@ export const extractPatientData = async (
 
     return sanitizedData;
   } catch (error: any) {
+    console.error('Erro detalhado na extração de dados:', {
+      message: error.message,
+      status: error.status,
+      stack: error.stack,
+      name: error.name
+    });
+    
+    // Handle model unavailable (503) - high demand
+    if (error.status === 503 || error.message?.includes("UNAVAILABLE") || error.message?.includes("high demand")) {
+      if (retryCount < 5) { // Mais tentativas para erro 503
+        const delay = Math.min(Math.pow(2, retryCount) * 3000, 30000); // 3s, 6s, 12s, 24s, 30s máx
+        const nextModel = models[Math.min(retryCount + 1, models.length - 1)];
+        console.warn(`Modelo ${modelToUse} indisponível (503). Retrying with ${nextModel} in ${delay}ms... (Attempt ${retryCount + 1}/5)`);
+        await sleep(delay);
+        return extractPatientData(input, retryCount + 1);
+      } else {
+        throw new Error('O modelo Gemini está temporariamente indisponível devido à alta demanda. Por favor, tente novamente em alguns minutos.');
+      }
+    }
+    
     // Handle quota exceeded (429)
     if (error.message?.includes("429") || error.status === 429 || error.message?.includes("RESOURCE_EXHAUSTED")) {
       if (retryCount < 3) {
@@ -211,7 +259,19 @@ export const extractPatientData = async (
       }
     }
     
+    // Handle API key issues
+    if (error.message?.includes("API_KEY") || error.message?.includes("authentication") || error.status === 401) {
+      console.error('Erro de autenticação da API Gemini');
+      throw new Error('Chave da API Gemini inválida ou expirada. Verifique sua configuração.');
+    }
+    
+    // Handle network issues
+    if (error.message?.includes("network") || error.message?.includes("fetch") || error.code === 'ENOTFOUND') {
+      console.error('Erro de conexão com a API Gemini');
+      throw new Error('Erro de conexão com a API. Verifique sua internet e tente novamente.');
+    }
+    
     console.error("Failed to extract patient data", error);
-    throw error;
+    throw new Error(`Erro ao processar prontuário: ${error.message || 'Erro desconhecido'}`);
   }
 };

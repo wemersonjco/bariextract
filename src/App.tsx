@@ -76,6 +76,7 @@ export default function App() {
   const [currentFiles, setCurrentFiles] = useState<{ data: string, mimeType: string, name: string }[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [retryStatus, setRetryStatus] = useState<string>('');
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -249,6 +250,17 @@ export default function App() {
     
     setIsProcessing(true);
     setProgress(0);
+    setRetryStatus('');
+    
+    // Interceptador de console logs para capturar status de retry
+    const originalConsoleWarn = console.warn;
+    console.warn = (...args) => {
+      const message = args.join(' ');
+      if (message.includes('Modelo Gemini indisponível') || message.includes('Retrying')) {
+        setRetryStatus(message);
+      }
+      originalConsoleWarn(...args);
+    };
     
     const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
     
@@ -480,15 +492,30 @@ export default function App() {
       setCurrentRecord('');
       setCurrentFiles([]);
     } catch (error: any) {
-      console.error(error);
-      if (error.message?.includes("429") || error.message?.includes("RESOURCE_EXHAUSTED")) {
+      console.error('Erro no processamento:', error);
+      
+      // Mensagens de erro específicas
+      if (error.message?.includes("Chave da API Gemini não configurada")) {
+        alert('Erro: Chave da API Gemini não configurada. Verifique o arquivo .env e adicione sua chave GEMINI_API_KEY.');
+      } else if (error.message?.includes("Chave da API Gemini inválida")) {
+        alert('Erro: Chave da API Gemini inválida ou expirada. Verifique sua chave e tente novamente.');
+      } else if (error.message?.includes("Erro de conexão")) {
+        alert('Erro: Falha na conexão com a API. Verifique sua conexão com a internet e tente novamente.');
+      } else if (error.message?.includes("modelo Gemini está temporariamente indisponível") || error.message?.includes("alta demanda")) {
+        alert('O modelo Gemini está temporariamente indisponível devido à alta demanda. O sistema tentará novamente automaticamente. Por favor, aguarde alguns instantes.');
+      } else if (error.message?.includes("429") || error.message?.includes("RESOURCE_EXHAUSTED")) {
         alert('Limite de uso do Gemini atingido. Por favor, aguarde um momento e tente novamente com menos arquivos.');
+      } else if (error.message?.includes("Erro ao processar prontuário")) {
+        alert(`Erro ao processar prontuário: ${error.message}`);
       } else {
-        alert('Erro ao processar prontuários. Verifique sua conexão ou chave de API.');
+        alert('Erro ao processar prontuários. Verifique sua conexão ou chave de API.\n\nDetalhes: ' + (error.message || 'Erro desconhecido'));
       }
     } finally {
+      // Restaurar console.warn original
+      console.warn = originalConsoleWarn;
       setIsProcessing(false);
       setProgress(0);
+      setRetryStatus('');
     }
   };
 
@@ -1055,6 +1082,11 @@ Apto para cirurgia após liberação da cardiologia e nutrição.`);
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
                             <span>Processando ({progress}%)</span>
+                            {retryStatus && (
+                              <span className="text-xs text-amber-600 ml-2">
+                                {retryStatus.includes('Retrying') ? '⏳' : '⚠️'} {retryStatus}
+                              </span>
+                            )}
                             <motion.div 
                               className="absolute bottom-0 left-0 h-1 bg-emerald-500"
                               initial={{ width: 0 }}
