@@ -159,7 +159,47 @@ export const extractPatientData = async (
       },
     });
 
-    return JSON.parse(response.text || "{}");
+    const rawData = response.text || "{}";
+    
+    // Parse and validate the response
+    let parsedData;
+    try {
+      parsedData = JSON.parse(rawData);
+    } catch (parseError) {
+      console.error("Failed to parse JSON response from Gemini:", parseError);
+      return {};
+    }
+
+    // Sanitize all string values to prevent null/undefined issues
+    const sanitizedData: Partial<PatientData> = {};
+    const stringFields = [
+      'num', 'nome', 'prontuario', 'sexo', 'idadePrimeiraConsulta', 'municipio', 
+      'estadoCivil', 'numFilhos', 'ocupacao', 'escolaridade', 'cuidadorPosOp',
+      'dataPrimeiraConsulta', 'dataEmissaoAIH', 'tempoProtocolo', 'dataCirurgia',
+      'idadeNaCirurgia', 'tipoCirurgia', 'pesoInicial', 'pesoUltimoPreOp',
+      'variacaoPesoPreOp', 'altura', 'imcInicial', 'imcUltimoPreOp', 'expectativaPeso',
+      'perdaEsperada', 'tabagismo', 'etilismo', 'atividadeFisicaPre', 'comerEmocional',
+      'autoavaliacaoPsicologica', 'obesidadeDesde', 'tentativasEmagrecimento',
+      'cirurgiasPrevias', 'has', 'dm2', 'dislipidemia', 'esteatoseHepatica',
+      'colelitiasePre', 'asma', 'outrasComorbidades', 'medicacoesEmUso',
+      'hPyloriResultado', 'hPyloriSituacao', 'edaResultado', 'fezColonoscopia',
+      'resultadoColonoscopia', 'outrasAlteracoesGI', 'usgAbdome', 'espirometriaResultado',
+      'rxTorax', 'ecoFE', 'ecoPSAP', 'ecoOutrasAlteracoes', 'riscoPulmonar', 'riscoCV',
+      'clexaneDose', 'hbA1c', 'glicemiaJejum', 'tsh', 't4Livre', 'b12', 'vitaminaD',
+      'colesterolTotal', 'hdl', 'ldl', 'triglicerideos', 'tgo', 'tgp', 'pesoPO9dias',
+      'pesoPO40dias', 'pesoPO4_5meses', 'pesoPO5meses', 'pesoPO7meses', 'pesoPO11meses',
+      'peso1AnoPO', 'perdaAbsoluta1Ano', 'percentExcessoPesoPerdido',
+      'atividadeFisica1AnoPO', 'excessoPele', 'complicacoesPO', 'adesaoSuplementacao',
+      'altaCB', 'observacoesClinicas', 'ultimoIMC', 'edaPosData', 'edaPosUrease',
+      'edaPosHPylori', 'edaPosAchados', 'usgPosData', 'usgPosVesicula', 'usgPosObservacoes'
+    ];
+
+    stringFields.forEach(field => {
+      const value = parsedData[field];
+      sanitizedData[field as keyof PatientData] = (typeof value === 'string' ? value.trim() : '') || '';
+    });
+
+    return sanitizedData;
   } catch (error: any) {
     // Handle quota exceeded (429)
     if (error.message?.includes("429") || error.status === 429 || error.message?.includes("RESOURCE_EXHAUSTED")) {

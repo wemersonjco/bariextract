@@ -274,96 +274,96 @@ export default function App() {
         const newPatient: PatientData = {
           id: crypto.randomUUID(),
           num: (patients.length + newPatientsList.length + 1).toString(),
-          nome: extracted.nome || `Paciente ${patients.length + newPatientsList.length + 1}`,
-          prontuario: extracted.prontuario || '',
-          sexo: extracted.sexo || '',
-          idadePrimeiraConsulta: extracted.idadePrimeiraConsulta || '',
-          municipio: extracted.municipio || '',
-          estadoCivil: extracted.estadoCivil || '',
-          numFilhos: extracted.numFilhos || '',
-          ocupacao: extracted.ocupacao || '',
-          escolaridade: extracted.escolaridade || '',
-          cuidadorPosOp: extracted.cuidadorPosOp || '',
-          dataPrimeiraConsulta: extracted.dataPrimeiraConsulta || '',
-          dataEmissaoAIH: extracted.dataEmissaoAIH || '',
-          tempoProtocolo: extracted.tempoProtocolo || '',
-          dataCirurgia: extracted.dataCirurgia || '',
-          idadeNaCirurgia: extracted.idadeNaCirurgia || '',
-          tipoCirurgia: extracted.tipoCirurgia || '',
-          pesoInicial: extracted.pesoInicial || '',
-          pesoUltimoPreOp: extracted.pesoUltimoPreOp || '',
-          variacaoPesoPreOp: extracted.variacaoPesoPreOp || '',
-          altura: extracted.altura || '',
-          imcInicial: extracted.imcInicial || '',
-          imcUltimoPreOp: extracted.imcUltimoPreOp || '',
-          expectativaPeso: extracted.expectativaPeso || '',
-          perdaEsperada: extracted.perdaEsperada || '',
-          tabagismo: extracted.tabagismo || '',
-          etilismo: extracted.etilismo || '',
-          atividadeFisicaPre: extracted.atividadeFisicaPre || '',
-          comerEmocional: extracted.comerEmocional || '',
-          autoavaliacaoPsicologica: extracted.autoavaliacaoPsicologica || '',
-          obesidadeDesde: extracted.obesidadeDesde || '',
-          tentativasEmagrecimento: extracted.tentativasEmagrecimento || '',
-          cirurgiasPrevias: extracted.cirurgiasPrevias || '',
-          has: extracted.has || '',
-          dm2: extracted.dm2 || '',
-          dislipidemia: extracted.dislipidemia || '',
-          esteatoseHepatica: extracted.esteatoseHepatica || '',
-          colelitiasePre: extracted.colelitiasePre || '',
-          asma: extracted.asma || '',
-          outrasComorbidades: extracted.outrasComorbidades || '',
-          medicacoesEmUso: extracted.medicacoesEmUso || '',
-          hPyloriResultado: extracted.hPyloriResultado || '',
-          hPyloriSituacao: extracted.hPyloriSituacao || '',
-          edaResultado: extracted.edaResultado || '',
-          fezColonoscopia: extracted.fezColonoscopia || '',
-          resultadoColonoscopia: extracted.resultadoColonoscopia || '',
-          outrasAlteracoesGI: extracted.outrasAlteracoesGI || '',
-          usgAbdome: extracted.usgAbdome || '',
-          espirometriaResultado: extracted.espirometriaResultado || '',
-          rxTorax: extracted.rxTorax || '',
-          ecoFE: extracted.ecoFE || '',
-          ecoPSAP: extracted.ecoPSAP || '',
-          ecoOutrasAlteracoes: extracted.ecoOutrasAlteracoes || '',
-          riscoPulmonar: extracted.riscoPulmonar || '',
-          riscoCV: extracted.riscoCV || '',
-          clexaneDose: extracted.clexaneDose || '',
-          hbA1c: extracted.hbA1c || '',
-          glicemiaJejum: extracted.glicemiaJejum || '',
-          tsh: extracted.tsh || '',
-          t4Livre: extracted.t4Livre || '',
-          b12: extracted.b12 || '',
-          vitaminaD: extracted.vitaminaD || '',
-          colesterolTotal: extracted.colesterolTotal || '',
-          hdl: extracted.hdl || '',
-          ldl: extracted.ldl || '',
-          triglicerideos: extracted.triglicerideos || '',
-          tgo: extracted.tgo || '',
-          tgp: extracted.tgp || '',
-          pesoPO9dias: extracted.pesoPO9dias || '',
-          pesoPO40dias: extracted.pesoPO40dias || '',
-          pesoPO4_5meses: extracted.pesoPO4_5meses || '',
-          pesoPO5meses: extracted.pesoPO5meses || '',
-          pesoPO7meses: extracted.pesoPO7meses || '',
-          pesoPO11meses: extracted.pesoPO11meses || '',
-          peso1AnoPO: extracted.peso1AnoPO || '',
-          perdaAbsoluta1Ano: extracted.perdaAbsoluta1Ano || '',
-          percentExcessoPesoPerdido: extracted.percentExcessoPesoPerdido || '',
-          atividadeFisica1AnoPO: extracted.atividadeFisica1AnoPO || '',
-          excessoPele: extracted.excessoPele || '',
-          complicacoesPO: extracted.complicacoesPO || '',
-          adesaoSuplementacao: extracted.adesaoSuplementacao || '',
-          altaCB: extracted.altaCB || '',
-          observacoesClinicas: extracted.observacoesClinicas || '',
-          ultimoIMC: extracted.ultimoIMC || '',
-          edaPosData: extracted.edaPosData || '',
-          edaPosUrease: extracted.edaPosUrease || '',
-          edaPosHPylori: extracted.edaPosHPylori || '',
-          edaPosAchados: extracted.edaPosAchados || '',
-          usgPosData: extracted.usgPosData || '',
-          usgPosVesicula: extracted.usgPosVesicula || '',
-          usgPosObservacoes: extracted.usgPosObservacoes || '',
+          nome: extracted.nome?.trim() || `Paciente ${patients.length + newPatientsList.length + 1}`,
+          prontuario: extracted.prontuario?.trim() || '',
+          sexo: extracted.sexo?.trim() || '',
+          idadePrimeiraConsulta: extracted.idadePrimeiraConsulta?.trim() || '',
+          municipio: extracted.municipio?.trim() || '',
+          estadoCivil: extracted.estadoCivil?.trim() || '',
+          numFilhos: extracted.numFilhos?.trim() || '',
+          ocupacao: extracted.ocupacao?.trim() || '',
+          escolaridade: extracted.escolaridade?.trim() || '',
+          cuidadorPosOp: extracted.cuidadorPosOp?.trim() || '',
+          dataPrimeiraConsulta: extracted.dataPrimeiraConsulta?.trim() || '',
+          dataEmissaoAIH: extracted.dataEmissaoAIH?.trim() || '',
+          tempoProtocolo: extracted.tempoProtocolo?.trim() || '',
+          dataCirurgia: extracted.dataCirurgia?.trim() || '',
+          idadeNaCirurgia: extracted.idadeNaCirurgia?.trim() || '',
+          tipoCirurgia: extracted.tipoCirurgia?.trim() || '',
+          pesoInicial: extracted.pesoInicial?.trim() || '',
+          pesoUltimoPreOp: extracted.pesoUltimoPreOp?.trim() || '',
+          variacaoPesoPreOp: extracted.variacaoPesoPreOp?.trim() || '',
+          altura: extracted.altura?.trim() || '',
+          imcInicial: extracted.imcInicial?.trim() || '',
+          imcUltimoPreOp: extracted.imcUltimoPreOp?.trim() || '',
+          expectativaPeso: extracted.expectativaPeso?.trim() || '',
+          perdaEsperada: extracted.perdaEsperada?.trim() || '',
+          tabagismo: extracted.tabagismo?.trim() || '',
+          etilismo: extracted.etilismo?.trim() || '',
+          atividadeFisicaPre: extracted.atividadeFisicaPre?.trim() || '',
+          comerEmocional: extracted.comerEmocional?.trim() || '',
+          autoavaliacaoPsicologica: extracted.autoavaliacaoPsicologica?.trim() || '',
+          obesidadeDesde: extracted.obesidadeDesde?.trim() || '',
+          tentativasEmagrecimento: extracted.tentativasEmagrecimento?.trim() || '',
+          cirurgiasPrevias: extracted.cirurgiasPrevias?.trim() || '',
+          has: extracted.has?.trim() || '',
+          dm2: extracted.dm2?.trim() || '',
+          dislipidemia: extracted.dislipidemia?.trim() || '',
+          esteatoseHepatica: extracted.esteatoseHepatica?.trim() || '',
+          colelitiasePre: extracted.colelitiasePre?.trim() || '',
+          asma: extracted.asma?.trim() || '',
+          outrasComorbidades: extracted.outrasComorbidades?.trim() || '',
+          medicacoesEmUso: extracted.medicacoesEmUso?.trim() || '',
+          hPyloriResultado: extracted.hPyloriResultado?.trim() || '',
+          hPyloriSituacao: extracted.hPyloriSituacao?.trim() || '',
+          edaResultado: extracted.edaResultado?.trim() || '',
+          fezColonoscopia: extracted.fezColonoscopia?.trim() || '',
+          resultadoColonoscopia: extracted.resultadoColonoscopia?.trim() || '',
+          outrasAlteracoesGI: extracted.outrasAlteracoesGI?.trim() || '',
+          usgAbdome: extracted.usgAbdome?.trim() || '',
+          espirometriaResultado: extracted.espirometriaResultado?.trim() || '',
+          rxTorax: extracted.rxTorax?.trim() || '',
+          ecoFE: extracted.ecoFE?.trim() || '',
+          ecoPSAP: extracted.ecoPSAP?.trim() || '',
+          ecoOutrasAlteracoes: extracted.ecoOutrasAlteracoes?.trim() || '',
+          riscoPulmonar: extracted.riscoPulmonar?.trim() || '',
+          riscoCV: extracted.riscoCV?.trim() || '',
+          clexaneDose: extracted.clexaneDose?.trim() || '',
+          hbA1c: extracted.hbA1c?.trim() || '',
+          glicemiaJejum: extracted.glicemiaJejum?.trim() || '',
+          tsh: extracted.tsh?.trim() || '',
+          t4Livre: extracted.t4Livre?.trim() || '',
+          b12: extracted.b12?.trim() || '',
+          vitaminaD: extracted.vitaminaD?.trim() || '',
+          colesterolTotal: extracted.colesterolTotal?.trim() || '',
+          hdl: extracted.hdl?.trim() || '',
+          ldl: extracted.ldl?.trim() || '',
+          triglicerideos: extracted.triglicerideos?.trim() || '',
+          tgo: extracted.tgo?.trim() || '',
+          tgp: extracted.tgp?.trim() || '',
+          pesoPO9dias: extracted.pesoPO9dias?.trim() || '',
+          pesoPO40dias: extracted.pesoPO40dias?.trim() || '',
+          pesoPO4_5meses: extracted.pesoPO4_5meses?.trim() || '',
+          pesoPO5meses: extracted.pesoPO5meses?.trim() || '',
+          pesoPO7meses: extracted.pesoPO7meses?.trim() || '',
+          pesoPO11meses: extracted.pesoPO11meses?.trim() || '',
+          peso1AnoPO: extracted.peso1AnoPO?.trim() || '',
+          perdaAbsoluta1Ano: extracted.perdaAbsoluta1Ano?.trim() || '',
+          percentExcessoPesoPerdido: extracted.percentExcessoPesoPerdido?.trim() || '',
+          atividadeFisica1AnoPO: extracted.atividadeFisica1AnoPO?.trim() || '',
+          excessoPele: extracted.excessoPele?.trim() || '',
+          complicacoesPO: extracted.complicacoesPO?.trim() || '',
+          adesaoSuplementacao: extracted.adesaoSuplementacao?.trim() || '',
+          altaCB: extracted.altaCB?.trim() || '',
+          observacoesClinicas: extracted.observacoesClinicas?.trim() || '',
+          ultimoIMC: extracted.ultimoIMC?.trim() || '',
+          edaPosData: extracted.edaPosData?.trim() || '',
+          edaPosUrease: extracted.edaPosUrease?.trim() || '',
+          edaPosHPylori: extracted.edaPosHPylori?.trim() || '',
+          edaPosAchados: extracted.edaPosAchados?.trim() || '',
+          usgPosData: extracted.usgPosData?.trim() || '',
+          usgPosVesicula: extracted.usgPosVesicula?.trim() || '',
+          usgPosObservacoes: extracted.usgPosObservacoes?.trim() || '',
           lastEditedAt: new Date().toISOString()
         };
 
@@ -474,7 +474,7 @@ export default function App() {
       }
 
       setPatients(prev => [...prev, ...newPatientsList]);
-      if (newPatientsList.length > 0) {
+      if (newPatientsList.length > 0 && newPatientsList[newPatientsList.length - 1]?.id) {
         setSelectedPatientId(newPatientsList[newPatientsList.length - 1].id);
       }
       setCurrentRecord('');
@@ -687,13 +687,13 @@ export default function App() {
     p.prontuario.includes(searchTerm)
   );
 
-  const selectedPatient = patients.find(p => p.id === selectedPatientId);
+  const selectedPatient = patients.find(p => p.id === selectedPatientId) || null;
 
-  const calculatePostOpTime = (cirurgia: string, exame: string) => {
-    if (!cirurgia || !exame) return 'N/A';
+  const calculatePostOpTime = (cirurgia: string | null | undefined, exame: string | null | undefined) => {
+    if (!cirurgia?.trim() || !exame?.trim()) return 'N/A';
     try {
-      const dateCirurgia = parse(cirurgia, 'dd/MM/yyyy', new Date());
-      const dateExame = parse(exame, 'dd/MM/yyyy', new Date());
+      const dateCirurgia = parse(cirurgia.trim(), 'dd/MM/yyyy', new Date());
+      const dateExame = parse(exame.trim(), 'dd/MM/yyyy', new Date());
       const months = differenceInMonths(dateExame, dateCirurgia);
       if (months < 12) return `${months} meses`;
       const years = differenceInYears(dateExame, dateCirurgia);
@@ -988,7 +988,7 @@ export default function App() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
           {isEditing && renderEditForm()}
         </AnimatePresence>
         <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8">
@@ -1149,7 +1149,7 @@ Apto para cirurgia após liberação da cardiologia e nutrição.`);
 
                 {/* Results Section */}
                 <AnimatePresence mode="wait">
-                  {selectedPatient ? (
+                  {selectedPatient && selectedPatient.id ? (
                     <motion.section
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -1180,61 +1180,61 @@ Apto para cirurgia após liberação da cardiologia e nutrição.`);
                       <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {/* Identification */}
                         <DataGroup title="Identificação">
-                          <DataItem label="Sexo" value={selectedPatient.sexo} />
-                          <DataItem label="Idade 1ª Consulta" value={selectedPatient.idadePrimeiraConsulta} />
-                          <DataItem label="Município" value={selectedPatient.municipio} />
-                          <DataItem label="Estado Civil" value={selectedPatient.estadoCivil} />
-                          <DataItem label="Nº Filhos" value={selectedPatient.numFilhos} />
-                          <DataItem label="Escolaridade" value={selectedPatient.escolaridade} />
+                          <DataItem label="Sexo" value={selectedPatient?.sexo} />
+                          <DataItem label="Idade 1ª Consulta" value={selectedPatient?.idadePrimeiraConsulta} />
+                          <DataItem label="Município" value={selectedPatient?.municipio} />
+                          <DataItem label="Estado Civil" value={selectedPatient?.estadoCivil} />
+                          <DataItem label="Nº Filhos" value={selectedPatient?.numFilhos} />
+                          <DataItem label="Escolaridade" value={selectedPatient?.escolaridade} />
                         </DataGroup>
 
                         {/* Pre-op */}
                         <DataGroup title="Antropometria Pré-op">
-                          <DataItem label="Peso Inicial" value={selectedPatient.pesoInicial} />
-                          <DataItem label="Peso Último" value={selectedPatient.pesoUltimoPreOp} />
-                          <DataItem label="Variação Peso" value={selectedPatient.variacaoPesoPreOp} />
-                          <DataItem label="Altura" value={selectedPatient.altura} />
-                          <DataItem label="IMC Inicial" value={selectedPatient.imcInicial} />
-                          <DataItem label="Último IMC" value={selectedPatient.ultimoIMC} />
-                          <DataItem label="% Perda Peso" value={selectedPatient.percentExcessoPesoPerdido} />
-                          <DataItem label="Tipo Cirurgia" value={selectedPatient.tipoCirurgia} />
+                          <DataItem label="Peso Inicial" value={selectedPatient?.pesoInicial} />
+                          <DataItem label="Peso Último" value={selectedPatient?.pesoUltimoPreOp} />
+                          <DataItem label="Variação Peso" value={selectedPatient?.variacaoPesoPreOp} />
+                          <DataItem label="Altura" value={selectedPatient?.altura} />
+                          <DataItem label="IMC Inicial" value={selectedPatient?.imcInicial} />
+                          <DataItem label="Último IMC" value={selectedPatient?.ultimoIMC} />
+                          <DataItem label="% Perda Peso" value={selectedPatient?.percentExcessoPesoPerdido} />
+                          <DataItem label="Tipo Cirurgia" value={selectedPatient?.tipoCirurgia} />
                         </DataGroup>
 
                         {/* Comorbidities */}
                         <DataGroup title="Comorbidades">
-                          <DataItem label="HAS" value={selectedPatient.has} />
-                          <DataItem label="DM2" value={selectedPatient.dm2} />
-                          <DataItem label="Dislipidemia" value={selectedPatient.dislipidemia} />
-                          <DataItem label="Esteatose" value={selectedPatient.esteatoseHepatica} />
-                          <DataItem label="Colelitíase Pré" value={selectedPatient.colelitiasePre} />
+                          <DataItem label="HAS" value={selectedPatient?.has} />
+                          <DataItem label="DM2" value={selectedPatient?.dm2} />
+                          <DataItem label="Dislipidemia" value={selectedPatient?.dislipidemia} />
+                          <DataItem label="Esteatose" value={selectedPatient?.esteatoseHepatica} />
+                          <DataItem label="Colelitíase Pré" value={selectedPatient?.colelitiasePre} />
                         </DataGroup>
 
                         {/* Labs & Exams */}
                         <DataGroup title="Exames Pré-operatórios">
-                          <DataItem label="H. Pylori" value={selectedPatient.hPyloriResultado} />
-                          <DataItem label="EDA" value={selectedPatient.edaResultado} />
-                          <DataItem label="Colonoscopia?" value={selectedPatient.fezColonoscopia} />
-                          <DataItem label="Resultado Colono" value={selectedPatient.resultadoColonoscopia} />
-                          <DataItem label="USG Abdome" value={selectedPatient.usgAbdome} />
+                          <DataItem label="H. Pylori" value={selectedPatient?.hPyloriResultado} />
+                          <DataItem label="EDA" value={selectedPatient?.edaResultado} />
+                          <DataItem label="Colonoscopia?" value={selectedPatient?.fezColonoscopia} />
+                          <DataItem label="Resultado Colono" value={selectedPatient?.resultadoColonoscopia} />
+                          <DataItem label="USG Abdome" value={selectedPatient?.usgAbdome} />
                         </DataGroup>
 
                         {/* EDA Pós */}
                         <DataGroup title="EDA Pós-operatória">
-                          <DataItem label="Data" value={selectedPatient.edaPosData} />
-                          <DataItem label="Tempo Pós" value={calculatePostOpTime(selectedPatient.dataCirurgia, selectedPatient.edaPosData)} />
-                          <DataItem label="Urease" value={selectedPatient.edaPosUrease} />
-                          <DataItem label="H. Pylori" value={selectedPatient.edaPosHPylori} />
-                          <DataItem label="Achados" value={selectedPatient.edaPosAchados} />
+                          <DataItem label="Data" value={selectedPatient?.edaPosData} />
+                          <DataItem label="Tempo Pós" value={calculatePostOpTime(selectedPatient?.dataCirurgia || '', selectedPatient?.edaPosData || '')} />
+                          <DataItem label="Urease" value={selectedPatient?.edaPosUrease} />
+                          <DataItem label="H. Pylori" value={selectedPatient?.edaPosHPylori} />
+                          <DataItem label="Achados" value={selectedPatient?.edaPosAchados} />
                           <div className="mt-2 p-2 bg-gray-50 rounded-lg border border-gray-100">
                             <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Comparativo EDA</p>
                             <div className="grid grid-cols-2 gap-2">
                               <div>
                                 <p className="text-[9px] text-gray-400">Pré</p>
-                                <p className="text-[10px] font-medium truncate">{selectedPatient.edaResultado || 'N/A'}</p>
+                                <p className="text-[10px] font-medium truncate">{selectedPatient?.edaResultado || 'N/A'}</p>
                               </div>
                               <div>
                                 <p className="text-[9px] text-gray-400">Pós</p>
-                                <p className="text-[10px] font-medium truncate">{selectedPatient.edaPosAchados || 'N/A'}</p>
+                                <p className="text-[10px] font-medium truncate">{selectedPatient?.edaPosAchados || 'N/A'}</p>
                               </div>
                             </div>
                           </div>
@@ -1242,23 +1242,23 @@ Apto para cirurgia após liberação da cardiologia e nutrição.`);
 
                         {/* USG Pós */}
                         <DataGroup title="USG Pós-operatório">
-                          <DataItem label="Data" value={selectedPatient.usgPosData} />
-                          <DataItem label="Tempo Pós" value={calculatePostOpTime(selectedPatient.dataCirurgia, selectedPatient.usgPosData)} />
-                          <DataItem label="Vesícula" value={selectedPatient.usgPosVesicula} />
-                          {selectedPatient.usgPosVesicula?.toLowerCase().includes('coleli') && (
+                          <DataItem label="Data" value={selectedPatient?.usgPosData} />
+                          <DataItem label="Tempo Pós" value={calculatePostOpTime(selectedPatient?.dataCirurgia || '', selectedPatient?.usgPosData || '')} />
+                          <DataItem label="Vesícula" value={selectedPatient?.usgPosVesicula} />
+                          {selectedPatient?.usgPosVesicula?.toLowerCase().includes('coleli') && (
                             <div className="flex items-center gap-1 px-2 py-0.5 bg-red-50 text-red-600 rounded text-[9px] font-bold uppercase">
                               <AlertCircle className="w-2 h-2" />
                               Desenvolveu Colelitíase
                             </div>
                           )}
-                          <DataItem label="Observações" value={selectedPatient.usgPosObservacoes} />
+                          <DataItem label="Observações" value={selectedPatient?.usgPosObservacoes} />
                         </DataGroup>
 
                         {/* Post-op Follow-up */}
                         <DataGroup title="Acompanhamento Pós">
-                          <DataItem label="Peso 1 Ano" value={selectedPatient.peso1AnoPO} />
-                          <DataItem label="Complicações" value={selectedPatient.complicacoesPO} />
-                          <DataItem label="Adesão Supl." value={selectedPatient.adesaoSuplementacao} />
+                          <DataItem label="Peso 1 Ano" value={selectedPatient?.peso1AnoPO} />
+                          <DataItem label="Complicações" value={selectedPatient?.complicacoesPO} />
+                          <DataItem label="Adesão Supl." value={selectedPatient?.adesaoSuplementacao} />
                         </DataGroup>
                       </div>
 
@@ -1266,13 +1266,13 @@ Apto para cirurgia após liberação da cardiologia e nutrição.`);
                         <div>
                           <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Observações Clínicas</h4>
                           <p className="text-sm text-gray-700 leading-relaxed">
-                            {selectedPatient.observacoesClinicas || 'Nenhuma observação relevante extraída.'}
+                            {selectedPatient?.observacoesClinicas || 'Nenhuma observação relevante extraída.'}
                           </p>
                         </div>
-                        {selectedPatient.lastEditedAt && (
+                        {selectedPatient?.lastEditedAt && (
                           <div className="text-right">
                             <p className="text-[10px] text-gray-400 uppercase font-bold">Última Edição</p>
-                            <p className="text-[10px] text-gray-500">{format(new Date(selectedPatient.lastEditedAt), 'dd/MM/yyyy HH:mm')}</p>
+                            <p className="text-[10px] text-gray-500">{format(new Date(selectedPatient?.lastEditedAt || new Date()), 'dd/MM/yyyy HH:mm')}</p>
                           </div>
                         )}
                       </div>
@@ -1304,12 +1304,13 @@ function DataGroup({ title, children }: { title: string, children: React.ReactNo
   );
 }
 
-function DataItem({ label, value }: { label: string, value: string }) {
+function DataItem({ label, value }: { label: string, value: string | null | undefined }) {
+  const safeValue = value?.trim() || '';
   return (
     <div className="flex justify-between items-center gap-2">
       <span className="text-xs text-gray-500 font-medium">{label}</span>
-      <span className={`text-xs font-semibold truncate max-w-[150px] ${value ? 'text-gray-900' : 'text-gray-300 italic'}`}>
-        {value || 'N/A'}
+      <span className={`text-xs font-semibold truncate max-w-[150px] ${safeValue ? 'text-gray-900' : 'text-gray-300 italic'}`}>
+        {safeValue || 'N/A'}
       </span>
     </div>
   );
@@ -1343,14 +1344,15 @@ function ChartContainer({ title, children }: { title: string, children: React.Re
   );
 }
 
-function EditField({ label, value, onChange }: { label: string, value: string, onChange: (v: string) => void }) {
+function EditField({ label, value, onChange }: { label: string, value: string | null | undefined, onChange: (v: string) => void }) {
+  const safeValue = value?.trim() || '';
   return (
     <div className="space-y-1">
       <label className="text-[10px] font-bold text-gray-400 uppercase ml-1">{label}</label>
       <input 
         type="text" 
         className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
-        value={value}
+        value={safeValue}
         onChange={(e) => onChange(e.target.value)}
       />
     </div>
