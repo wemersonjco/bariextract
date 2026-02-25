@@ -1,0 +1,5 @@
+{
+  "name": "BariExtract - Coleta de Dados Clínicos",
+  "description": "Sistema de extração inteligente de dados de prontuários médicos para pesquisa em cirurgia bariátrica.",
+  "requestFramePermissions": []
+}
