@@ -40,7 +40,7 @@ export const extractPatientData = async (
   console.log('Chave da API configurada:', process.env.GEMINI_API_KEY ? 'Sim' : 'Não');
 
   // Tentar com modelo principal ou fallback
-  const models = ["gemini-3.1-pro-preview", "gemini-1.5-pro"];
+  const models = ["gemini-3.1-pro-preview"];
   const modelToUse = models[Math.min(retryCount, models.length - 1)];
   
   console.log(`Usando modelo: ${modelToUse} (tentativa ${retryCount + 1})`);
@@ -240,8 +240,7 @@ export const extractPatientData = async (
     if (error.status === 503 || error.message?.includes("UNAVAILABLE") || error.message?.includes("high demand")) {
       if (retryCount < 5) { // Mais tentativas para erro 503
         const delay = Math.min(Math.pow(2, retryCount) * 3000, 30000); // 3s, 6s, 12s, 24s, 30s máx
-        const nextModel = models[Math.min(retryCount + 1, models.length - 1)];
-        console.warn(`Modelo ${modelToUse} indisponível (503). Retrying with ${nextModel} in ${delay}ms... (Attempt ${retryCount + 1}/5)`);
+        console.warn(`Modelo ${modelToUse} indisponível (503). Retrying in ${delay}ms... (Attempt ${retryCount + 1}/5)`);
         await sleep(delay);
         return extractPatientData(input, retryCount + 1);
       } else {

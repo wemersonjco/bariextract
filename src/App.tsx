@@ -77,6 +77,7 @@ export default function App() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [retryStatus, setRetryStatus] = useState<string>('');
+  const [isAnimating, setIsAnimating] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -486,7 +487,7 @@ export default function App() {
       }
 
       setPatients(prev => [...prev, ...newPatientsList]);
-      if (newPatientsList.length > 0 && newPatientsList[newPatientsList.length - 1]?.id) {
+      if (newPatientsList.length > 0 && newPatientsList[newPatientsList.length - 1]?.id && !isAnimating) {
         setSelectedPatientId(newPatientsList[newPatientsList.length - 1].id);
       }
       setCurrentRecord('');
@@ -501,6 +502,8 @@ export default function App() {
         alert('Erro: Chave da API Gemini inválida ou expirada. Verifique sua chave e tente novamente.');
       } else if (error.message?.includes("Erro de conexão")) {
         alert('Erro: Falha na conexão com a API. Verifique sua conexão com a internet e tente novamente.');
+      } else if (error.message?.includes("Nenhum modelo Gemini disponível") || error.message?.includes("is not found")) {
+        alert('Erro: Nenhum modelo Gemini disponível foi encontrado. Isso pode ser um problema temporário da API. Tente novamente em alguns minutos.');
       } else if (error.message?.includes("modelo Gemini está temporariamente indisponível") || error.message?.includes("alta demanda")) {
         alert('O modelo Gemini está temporariamente indisponível devido à alta demanda. O sistema tentará novamente automaticamente. Por favor, aguarde alguns instantes.');
       } else if (error.message?.includes("429") || error.message?.includes("RESOURCE_EXHAUSTED")) {
@@ -582,7 +585,17 @@ export default function App() {
     }
   };
 
+  const handlePatientSelect = (patientId: string) => {
+    if (!isAnimating && !isProcessing) {
+      setIsAnimating(true);
+      setSelectedPatientId(patientId);
+      setTimeout(() => setIsAnimating(false), 300);
+    }
+  };
+
   const handleEdit = (patient: PatientData) => {
+    setIsAnimating(true);
+    setTimeout(() => setIsAnimating(false), 300); // Reset após animação
     setEditData({ ...patient });
     setIsEditing(true);
   };
@@ -740,6 +753,7 @@ export default function App() {
 
     return (
       <motion.div 
+        key={`edit-${editData?.id || 'new'}`}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
@@ -969,11 +983,13 @@ export default function App() {
                 <motion.div
                   layout
                   key={patient.id}
-                  onClick={() => setSelectedPatientId(patient.id)}
-                  className={`p-4 rounded-xl cursor-pointer transition-all border ${
+                  onClick={() => !isProcessing && handlePatientSelect(patient.id)}
+                  className={`p-4 rounded-xl transition-all border ${
                     selectedPatientId === patient.id 
                       ? 'bg-emerald-50 border-emerald-200 shadow-sm' 
-                      : 'bg-white border-transparent hover:bg-gray-50'
+                      : isProcessing
+                        ? 'bg-gray-50 border-gray-200 cursor-not-allowed opacity-50'
+                        : 'bg-white border-transparent hover:bg-gray-50 cursor-pointer'
                   }`}
                 >
                   <div className="flex justify-between items-start">
@@ -982,8 +998,13 @@ export default function App() {
                       <p className="text-xs text-gray-500 mt-1">Prontuário: {patient.prontuario}</p>
                     </div>
                     <button 
-                      onClick={(e) => { e.stopPropagation(); removePatient(patient.id); }}
-                      className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                      onClick={(e) => { e.stopPropagation(); !isProcessing && removePatient(patient.id); }}
+                      disabled={isProcessing}
+                      className={`p-1 transition-colors ${
+                        isProcessing 
+                          ? 'text-gray-300 cursor-not-allowed' 
+                          : 'text-gray-400 hover:text-red-500'
+                      }`}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -1183,6 +1204,7 @@ Apto para cirurgia após liberação da cardiologia e nutrição.`);
                 <AnimatePresence mode="wait">
                   {selectedPatient && selectedPatient.id ? (
                     <motion.section
+                      key={`patient-${selectedPatient.id}`}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
