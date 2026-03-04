@@ -2,7 +2,7 @@
 # Configure estas variáveis no painel da Vercel em Settings > Environment Variables
 
 # Chave da API Gemini (obrigatória)
-GEMINI_API_KEY=sua_chave_gemini_aqui
+VITE_GEMINI_API_KEY=sua_chave_gemini_aqui
 
 # Configuração do Supabase (opcional)
 VITE_SUPABASE_URL=https://seu-projeto.supabase.co
