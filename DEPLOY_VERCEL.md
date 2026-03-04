@@ -18,7 +18,7 @@ Acesse seu projeto na Vercel e vá em:
 Adicione as seguintes variáveis:
 
 #### **Obrigatórias:**
-- **Nome**: `GEMINI_API_KEY`
+- **Nome**: `VITE_GEMINI_KEY`
 - **Valor**: Sua chave da API Gemini
 - **Ambientes**: Production, Preview, Development
 
@@ -76,9 +76,9 @@ A Vercel irá automaticamente:
 
 ## 🚨 **Possíveis Problemas e Soluções**
 
-### **Erro: GEMINI_API_KEY não encontrada**
+### **Erro: VITE_GEMINI_KEY não encontrada**
 - Verifique se a variável foi configurada na Vercel
-- Confirme o nome exato: `GEMINI_API_KEY`
+- Confirme o nome exato: `VITE_GEMINI_KEY`
 
 ### **Erro: Rotas não encontradas (404)**
 - O `vercel.json` deve redirecionar para `index.html`

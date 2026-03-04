@@ -497,7 +497,7 @@ export default function App() {
       
       // Mensagens de erro específicas
       if (error.message?.includes("Chave da API Gemini não configurada")) {
-        alert('Erro: Chave da API Gemini não configurada. Verifique o arquivo .env e adicione sua chave VITE_GEMINI_API_KEY.');
+        alert('Erro: Chave da API Gemini não configurada. Verifique o arquivo .env e adicione sua chave VITE_GEMINI_KEY.');
       } else if (error.message?.includes("Chave da API Gemini inválida")) {
         alert('Erro: Chave da API Gemini inválida ou expirada. Verifique sua chave e tente novamente.');
       } else if (error.message?.includes("Erro de conexão")) {

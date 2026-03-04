@@ -12,7 +12,7 @@
 ### ✅ **Variáveis de Ambiente**
 Configure no painel Vercel > Settings > Environment Variables:
 
-- [ ] **GEMINI_API_KEY** (obrigatório)
+- [ ] **VITE_GEMINI_KEY** (obrigatório)
   - Valor: Sua chave da API Gemini
   - Ambientes: Production, Preview, Development
 
