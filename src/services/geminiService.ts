@@ -1,7 +1,7 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { PatientData } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY || "" });
+const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_KEY || "" });
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -32,12 +32,12 @@ export const extractPatientData = async (
   }
 
   // Verificar se a chave da API está configurada
-  if (!import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.VITE_GEMINI_API_KEY.trim() === '') {
-    console.error('VITE_GEMINI_API_KEY não está configurada ou está vazia');
+  if (!import.meta.env.VITE_GEMINI_KEY || import.meta.env.VITE_GEMINI_KEY.trim() === '') {
+    console.error('VITE_GEMINI_KEY não está configurada ou está vazia');
     throw new Error('Chave da API Gemini não configurada. Verifique suas variáveis de ambiente.');
   }
 
-  console.log('Chave da API configurada:', import.meta.env.VITE_GEMINI_API_KEY ? 'Sim' : 'Não');
+  console.log('Chave da API configurada:', import.meta.env.VITE_GEMINI_KEY ? 'Sim' : 'Não');
 
   // Tentar com modelo principal ou fallback
   const models = ["gemini-3.1-pro-preview"];
