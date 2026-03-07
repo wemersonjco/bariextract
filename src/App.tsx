@@ -28,7 +28,9 @@ import {
   BarChart as BarChartIcon,
   Activity,
   History,
-  Calendar
+  Calendar,
+  BarChart3,
+  TrendingUp
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import * as XLSX from 'xlsx';
@@ -49,6 +51,7 @@ import { Pie, Bar, Line } from 'react-chartjs-2';
 import { format, differenceInMonths, differenceInYears, parse } from 'date-fns';
 import { PatientData, CSV_HEADERS } from './types';
 import { extractPatientData } from './services/geminiService';
+import { normalizarDatasPaciente } from './utils/dataUtils';
 import { supabase, isSupabaseConfigured } from './services/supabaseService';
 
 ChartJS.register(
@@ -380,105 +383,107 @@ export default function App() {
           lastEditedAt: new Date().toISOString()
         };
 
-        newPatientsList.push(newPatient);
+        // Normalizar datas para formato DD/MM/YYYY antes de salvar
+        const pacienteNormalizado = normalizarDatasPaciente(newPatient);
+        newPatientsList.push(pacienteNormalizado);
 
         // Save to Supabase if configured
         if (isSupabaseConfigured()) {
           const { error } = await supabase
             .from('patients')
             .insert([{
-              num: newPatient.num,
-              nome: newPatient.nome,
-              prontuario: newPatient.prontuario,
-              sexo: newPatient.sexo,
-              idade_primeira_consulta: newPatient.idadePrimeiraConsulta,
-              municipio: newPatient.municipio,
-              estado_civil: newPatient.estadoCivil,
-              num_filhos: newPatient.numFilhos,
-              ocupacao: newPatient.ocupacao,
-              escolaridade: newPatient.escolaridade,
-              cuidador_pos_op: newPatient.cuidadorPosOp,
-              data_primeira_consulta: newPatient.dataPrimeiraConsulta,
-              data_emissao_aih: newPatient.dataEmissaoAIH,
-              tempo_protocolo: newPatient.tempoProtocolo,
-              data_cirurgia: newPatient.dataCirurgia,
-              idade_na_cirurgia: newPatient.idadeNaCirurgia,
-              tipo_cirurgia: newPatient.tipoCirurgia,
-              peso_inicial: newPatient.pesoInicial,
-              peso_ultimo_pre_op: newPatient.pesoUltimoPreOp,
-              variacao_peso_pre_op: newPatient.variacaoPesoPreOp,
-              altura: newPatient.altura,
-              imc_inicial: newPatient.imcInicial,
-              imc_ultimo_pre_op: newPatient.imcUltimoPreOp,
-              expectativa_peso: newPatient.expectativaPeso,
-              perda_esperada: newPatient.perdaEsperada,
-              tabagismo: newPatient.tabagismo,
-              etilismo: newPatient.etilismo,
-              atividade_fisica_pre: newPatient.atividadeFisicaPre,
-              comer_emocional: newPatient.comerEmocional,
-              autoavaliacao_psicologica: newPatient.autoavaliacaoPsicologica,
-              obesidade_desde: newPatient.obesidadeDesde,
-              tentativas_emagrecimento: newPatient.tentativasEmagrecimento,
-              cirurgias_previas: newPatient.cirurgiasPrevias,
-              has: newPatient.has,
-              dm2: newPatient.dm2,
-              dislipidemia: newPatient.dislipidemia,
-              esteatose_hepatica: newPatient.esteatoseHepatica,
-              colelitiase_pre: newPatient.colelitiasePre,
-              asma: newPatient.asma,
-              outras_comorbidades: newPatient.outrasComorbidades,
-              medicacoes_em_uso: newPatient.medicacoesEmUso,
-              h_pylori_resultado: newPatient.hPyloriResultado,
-              h_pylori_situacao: newPatient.hPyloriSituacao,
-              eda_resultado: newPatient.edaResultado,
-              fez_colonoscopia: newPatient.fezColonoscopia,
-              resultado_colonoscopia: newPatient.resultadoColonoscopia,
-              outras_alteracoes_gi: newPatient.outrasAlteracoesGI,
-              usg_abdome: newPatient.usgAbdome,
-              espirometria_resultado: newPatient.espirometriaResultado,
-              rx_torax: newPatient.rxTorax,
-              eco_fe: newPatient.ecoFE,
-              eco_psap: newPatient.ecoPSAP,
-              eco_outras_alteracoes: newPatient.ecoOutrasAlteracoes,
-              risco_pulmonar: newPatient.riscoPulmonar,
-              risco_cv: newPatient.riscoCV,
-              clexane_dose: newPatient.clexaneDose,
-              hba1c: newPatient.hbA1c,
-              glicemia_jejum: newPatient.glicemiaJejum,
-              tsh: newPatient.tsh,
-              t4_livre: newPatient.t4Livre,
-              b12: newPatient.b12,
-              vitamina_d: newPatient.vitaminaD,
-              colesterol_total: newPatient.colesterolTotal,
-              hdl: newPatient.hdl,
-              ldl: newPatient.ldl,
-              triglicerideos: newPatient.triglicerideos,
-              tgo: newPatient.tgo,
-              tgp: newPatient.tgp,
-              peso_po_9dias: newPatient.pesoPO9dias,
-              peso_po_40dias: newPatient.pesoPO40dias,
-              peso_po_4_5meses: newPatient.pesoPO4_5meses,
-              peso_po_5meses: newPatient.pesoPO5meses,
-              peso_po_7meses: newPatient.pesoPO7meses,
-              peso_po_11meses: newPatient.pesoPO11meses,
-              peso_1ano_po: newPatient.peso1AnoPO,
-              perda_absoluta_1ano: newPatient.perdaAbsoluta1Ano,
-              percent_excesso_peso_perdido: newPatient.percentExcessoPesoPerdido,
-              atividade_fisica_1ano_po: newPatient.atividadeFisica1AnoPO,
-              excesso_pele: newPatient.excessoPele,
-              complicacoes_po: newPatient.complicacoesPO,
-              adesao_suplementacao: newPatient.adesaoSuplementacao,
-              alta_cb: newPatient.altaCB,
-              observacoes_clinicas: newPatient.observacoesClinicas,
-              ultimo_imc: newPatient.ultimoIMC,
-              eda_pos_data: newPatient.edaPosData,
-              eda_pos_urease: newPatient.edaPosUrease,
-              eda_pos_h_pylori: newPatient.edaPosHPylori,
-              eda_pos_achados: newPatient.edaPosAchados,
-              usg_pos_data: newPatient.usgPosData,
-              usg_pos_vesicula: newPatient.usgPosVesicula,
-              usg_pos_observacoes: newPatient.usgPosObservacoes,
-              last_edited_at: newPatient.lastEditedAt
+              num: pacienteNormalizado.num,
+              nome: pacienteNormalizado.nome,
+              prontuario: pacienteNormalizado.prontuario,
+              sexo: pacienteNormalizado.sexo,
+              idade_primeira_consulta: pacienteNormalizado.idadePrimeiraConsulta,
+              municipio: pacienteNormalizado.municipio,
+              estado_civil: pacienteNormalizado.estadoCivil,
+              num_filhos: pacienteNormalizado.numFilhos,
+              ocupacao: pacienteNormalizado.ocupacao,
+              escolaridade: pacienteNormalizado.escolaridade,
+              cuidador_pos_op: pacienteNormalizado.cuidadorPosOp,
+              data_primeira_consulta: pacienteNormalizado.dataPrimeiraConsulta,
+              data_emissao_aih: pacienteNormalizado.dataEmissaoAIH,
+              tempo_protocolo: pacienteNormalizado.tempoProtocolo,
+              data_cirurgia: pacienteNormalizado.dataCirurgia,
+              idade_na_cirurgia: pacienteNormalizado.idadeNaCirurgia,
+              tipo_cirurgia: pacienteNormalizado.tipoCirurgia,
+              peso_inicial: pacienteNormalizado.pesoInicial,
+              peso_ultimo_pre_op: pacienteNormalizado.pesoUltimoPreOp,
+              variacao_peso_pre_op: pacienteNormalizado.variacaoPesoPreOp,
+              altura: pacienteNormalizado.altura,
+              imc_inicial: pacienteNormalizado.imcInicial,
+              imc_ultimo_pre_op: pacienteNormalizado.imcUltimoPreOp,
+              expectativa_peso: pacienteNormalizado.expectativaPeso,
+              perda_esperada: pacienteNormalizado.perdaEsperada,
+              tabagismo: pacienteNormalizado.tabagismo,
+              etilismo: pacienteNormalizado.etilismo,
+              atividade_fisica_pre: pacienteNormalizado.atividadeFisicaPre,
+              comer_emocional: pacienteNormalizado.comerEmocional,
+              autoavaliacao_psicologica: pacienteNormalizado.autoavaliacaoPsicologica,
+              obesidade_desde: pacienteNormalizado.obesidadeDesde,
+              tentativas_emagrecimento: pacienteNormalizado.tentativasEmagrecimento,
+              cirurgias_previas: pacienteNormalizado.cirurgiasPrevias,
+              has: pacienteNormalizado.has,
+              dm2: pacienteNormalizado.dm2,
+              dislipidemia: pacienteNormalizado.dislipidemia,
+              esteatose_hepatica: pacienteNormalizado.esteatoseHepatica,
+              colelitiase_pre: pacienteNormalizado.colelitiasePre,
+              asma: pacienteNormalizado.asma,
+              outras_comorbidades: pacienteNormalizado.outrasComorbidades,
+              medicacoes_em_uso: pacienteNormalizado.medicacoesEmUso,
+              h_pylori_resultado: pacienteNormalizado.hPyloriResultado,
+              h_pylori_situacao: pacienteNormalizado.hPyloriSituacao,
+              eda_resultado: pacienteNormalizado.edaResultado,
+              fez_colonoscopia: pacienteNormalizado.fezColonoscopia,
+              resultado_colonoscopia: pacienteNormalizado.resultadoColonoscopia,
+              outras_alteracoes_gi: pacienteNormalizado.outrasAlteracoesGI,
+              usg_abdome: pacienteNormalizado.usgAbdome,
+              espirometria_resultado: pacienteNormalizado.espirometriaResultado,
+              rx_torax: pacienteNormalizado.rxTorax,
+              eco_fe: pacienteNormalizado.ecoFE,
+              eco_psap: pacienteNormalizado.ecoPSAP,
+              eco_outras_alteracoes: pacienteNormalizado.ecoOutrasAlteracoes,
+              risco_pulmonar: pacienteNormalizado.riscoPulmonar,
+              risco_cv: pacienteNormalizado.riscoCV,
+              clexane_dose: pacienteNormalizado.clexaneDose,
+              hba1c: pacienteNormalizado.hbA1c,
+              glicemia_jejum: pacienteNormalizado.glicemiaJejum,
+              tsh: pacienteNormalizado.tsh,
+              t4_livre: pacienteNormalizado.t4Livre,
+              b12: pacienteNormalizado.b12,
+              vitamina_d: pacienteNormalizado.vitaminaD,
+              colesterol_total: pacienteNormalizado.colesterolTotal,
+              hdl: pacienteNormalizado.hdl,
+              ldl: pacienteNormalizado.ldl,
+              triglicerideos: pacienteNormalizado.triglicerideos,
+              tgo: pacienteNormalizado.tgo,
+              tgp: pacienteNormalizado.tgp,
+              peso_po_9dias: pacienteNormalizado.pesoPO9dias,
+              peso_po_40dias: pacienteNormalizado.pesoPO40dias,
+              peso_po_4_5meses: pacienteNormalizado.pesoPO4_5meses,
+              peso_po_5meses: pacienteNormalizado.pesoPO5meses,
+              peso_po_7meses: pacienteNormalizado.pesoPO7meses,
+              peso_po_11meses: pacienteNormalizado.pesoPO11meses,
+              peso_1ano_po: pacienteNormalizado.peso1AnoPO,
+              perda_absoluta_1ano: pacienteNormalizado.perdaAbsoluta1Ano,
+              percent_excesso_peso_perdido: pacienteNormalizado.percentExcessoPesoPerdido,
+              atividade_fisica_1ano_po: pacienteNormalizado.atividadeFisica1AnoPO,
+              excesso_pele: pacienteNormalizado.excessoPele,
+              complicacoes_po: pacienteNormalizado.complicacoesPO,
+              adesao_suplementacao: pacienteNormalizado.adesaoSuplementacao,
+              alta_cb: pacienteNormalizado.altaCB,
+              observacoes_clinicas: pacienteNormalizado.observacoesClinicas,
+              ultimo_imc: pacienteNormalizado.ultimoIMC,
+              eda_pos_data: pacienteNormalizado.edaPosData,
+              eda_pos_urease: pacienteNormalizado.edaPosUrease,
+              eda_pos_h_pylori: pacienteNormalizado.edaPosHPylori,
+              eda_pos_achados: pacienteNormalizado.edaPosAchados,
+              usg_pos_data: pacienteNormalizado.usgPosData,
+              usg_pos_vesicula: pacienteNormalizado.usgPosVesicula,
+              usg_pos_observacoes: pacienteNormalizado.usgPosObservacoes,
+              last_edited_at: pacienteNormalizado.lastEditedAt
             }]);
           
           if (error) console.error('Erro ao salvar no Supabase:', error);
@@ -525,8 +530,11 @@ export default function App() {
   const downloadExcel = () => {
     const wb = XLSX.utils.book_new();
     
+    // Normalizar datas de todos os pacientes antes de exportar
+    const pacientesNormalizados = patients.map(p => normalizarDatasPaciente(p));
+    
     // Dados Gerais
-    const generalData = patients.map(p => [
+    const generalData = pacientesNormalizados.map(p => [
       p.num, p.nome, p.prontuario, p.sexo, p.idadePrimeiraConsulta, p.municipio, p.estadoCivil, p.numFilhos, p.ocupacao, p.escolaridade, p.cuidadorPosOp, p.dataPrimeiraConsulta, p.dataEmissaoAIH, p.tempoProtocolo, p.dataCirurgia, p.idadeNaCirurgia, p.tipoCirurgia, p.pesoInicial, p.pesoUltimoPreOp, p.variacaoPesoPreOp, p.altura, p.imcInicial, p.imcUltimoPreOp, p.expectativaPeso, p.perdaEsperada, p.tabagismo, p.etilismo, p.atividadeFisicaPre, p.comerEmocional, p.autoavaliacaoPsicologica, p.obesidadeDesde, p.tentativasEmagrecimento, p.cirurgiasPrevias, p.observacoesClinicas, p.ultimoIMC
     ]);
     const wsGeneral = XLSX.utils.aoa_to_sheet([
@@ -536,7 +544,7 @@ export default function App() {
     XLSX.utils.book_append_sheet(wb, wsGeneral, "Dados Gerais");
 
     // Comorbidades
-    const comorbData = patients.map(p => [
+    const comorbData = pacientesNormalizados.map(p => [
       p.nome, p.has, p.dm2, p.dislipidemia, p.esteatoseHepatica, p.colelitiasePre, p.asma, p.outrasComorbidades, p.medicacoesEmUso
     ]);
     const wsComorb = XLSX.utils.aoa_to_sheet([
@@ -546,7 +554,7 @@ export default function App() {
     XLSX.utils.book_append_sheet(wb, wsComorb, "Comorbidades");
 
     // EDA e USG
-    const edaUsgData = patients.map(p => [
+    const edaUsgData = pacientesNormalizados.map(p => [
       p.nome, p.hPyloriResultado, p.hPyloriSituacao, p.edaResultado, p.fezColonoscopia, p.resultadoColonoscopia, p.usgAbdome, p.edaPosData, p.edaPosUrease, p.edaPosHPylori, p.edaPosAchados, p.usgPosData, p.usgPosVesicula, p.usgPosObservacoes
     ]);
     const wsEdaUsg = XLSX.utils.aoa_to_sheet([
@@ -556,7 +564,7 @@ export default function App() {
     XLSX.utils.book_append_sheet(wb, wsEdaUsg, "EDA e USG");
 
     // Pós-operatório
-    const poData = patients.map(p => [
+    const poData = pacientesNormalizados.map(p => [
       p.nome, p.pesoPO9dias, p.pesoPO40dias, p.pesoPO4_5meses, p.pesoPO5meses, p.pesoPO7meses, p.pesoPO11meses, p.peso1AnoPO, p.perdaAbsoluta1Ano, p.percentExcessoPesoPerdido, p.atividadeFisica1AnoPO, p.excessoPele, p.complicacoesPO, p.adesaoSuplementacao, p.altaCB
     ]);
     const wsPO = XLSX.utils.aoa_to_sheet([

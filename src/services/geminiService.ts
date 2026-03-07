@@ -1,5 +1,6 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { PatientData } from "../types";
+import { normalizarDatasPaciente } from "../utils/dataUtils";
 
 const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_KEY || "" });
 
@@ -227,7 +228,10 @@ export const extractPatientData = async (
       sanitizedData[field as keyof PatientData] = (typeof value === 'string' ? value.trim() : '') || '';
     });
 
-    return sanitizedData;
+    // Normalizar datas para formato DD/MM/YYYY
+    const dadosNormalizados = normalizarDatasPaciente(sanitizedData);
+
+    return dadosNormalizados;
   } catch (error: any) {
     console.error('Erro detalhado na extração de dados:', {
       message: error.message,
