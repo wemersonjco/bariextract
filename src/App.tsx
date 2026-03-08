@@ -564,7 +564,7 @@ export default function App() {
     }
   };
 
-  const downloadExcel = () => {
+  const downloadExcel = async () => {
     const wb = XLSX.utils.book_new();
     
     // Normalizar datas de todos os pacientes antes de exportar
@@ -609,6 +609,55 @@ export default function App() {
       ...poData
     ]);
     XLSX.utils.book_append_sheet(wb, wsPO, "Pós-operatório");
+
+    // Exames Laboratoriais - buscar da tabela separada
+    const labsData = [];
+    for (const paciente of pacientesNormalizados) {
+      try {
+        const { data: labData } = await getExamesLaboratoriais(paciente.id);
+        labsData.push([
+          paciente.nome,
+          labData?.data_lab_pre || '',
+          labData?.fonte_lab_pre || '',
+          labData?.hb_pre || '',
+          labData?.plaquetas_pre || '',
+          labData?.tgo_pre || '',
+          labData?.tgp_pre || '',
+          labData?.ggt_pre || '',
+          labData?.glicemia_pre || '',
+          labData?.hba1c_pre || '',
+          labData?.creatinina_pre || '',
+          labData?.ureia_pre || '',
+          labData?.ct_pre || '',
+          labData?.hdl_pre || '',
+          labData?.ldl_pre || '',
+          labData?.tg_pre || '',
+          labData?.vit_b12_pre || '',
+          labData?.vit_d_pre || '',
+          labData?.ferro_pre || '',
+          labData?.ferritina_pre || '',
+          labData?.tsh_pre || '',
+          labData?.t4l_pre || '',
+          labData?.albumina_pre || '',
+          labData?.insulina_pre || ''
+        ]);
+      } catch (error) {
+        // Se não tiver laboratoriais, adiciona linha vazia
+        labsData.push([
+          paciente.nome, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''
+        ]);
+      }
+    }
+    
+    const wsLabs = XLSX.utils.aoa_to_sheet([
+      [
+        "Nome", "Data Exames", "Fonte", "Hb", "Plaquetas", "TGO", "TGP", "GGT", 
+        "Glicemia", "HbA1c", "Creatinina", "Ureia", "CT", "HDL", "LDL", "TG", 
+        "Vit B12", "Vit D", "Ferro", "Ferritina", "TSH", "T4L", "Albumina", "Insulina"
+      ],
+      ...labsData
+    ]);
+    XLSX.utils.book_append_sheet(wb, wsLabs, "Exames Laboratoriais");
 
     XLSX.writeFile(wb, "pesquisa_bariatrica_completa.xlsx");
   };
