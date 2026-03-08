@@ -63,14 +63,15 @@ export default function ExtraçãoComplementar({ onClose, onSuccess }: Extraçã
       const { data, error } = await getPacientesSemLaboratoriais();
       if (error) {
         console.error('Erro ao carregar pacientes:', error);
-        setErrorMessage('Erro ao carregar lista de pacientes');
+        setErrorMessage(`Erro ao carregar lista de pacientes: ${error.message}`);
         setStatus('error');
       } else {
         setPacientes(data || []);
+        console.log('Pacientes carregados:', data?.length || 0);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao carregar pacientes:', error);
-      setErrorMessage('Erro ao carregar lista de pacientes');
+      setErrorMessage(`Erro ao carregar lista de pacientes: ${error.message}`);
       setStatus('error');
     } finally {
       setIsLoading(false);

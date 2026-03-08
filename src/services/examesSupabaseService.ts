@@ -65,8 +65,8 @@ export const getPacientesSemLaboratoriais = async (): Promise<{
   }
 
   try {
-    // Busca pacientes que não têm registros na tabela exames_laboratoriais
-    const { data, error } = await supabase
+    // Primeiro, buscar todos os pacientes
+    const { data: allPatients, error: patientsError } = await supabase
       .from('patients')
       .select(`
         id,
@@ -75,12 +75,27 @@ export const getPacientesSemLaboratoriais = async (): Promise<{
         prontuario,
         dataCirurgia
       `)
-      .is('exames_laboratoriais.patient_id', null)
       .order('nome', { ascending: true });
 
-    if (error) throw error;
+    if (patientsError) throw patientsError;
 
-    return { data: data || [], error: null };
+    // Depois, buscar pacientes que já têm laboratoriais
+    let patientsWithLabs: string[] = [];
+    try {
+      const { data: labsData } = await supabase
+        .from('exames_laboratoriais')
+        .select('patient_id');
+      
+      patientsWithLabs = labsData?.map(l => l.patient_id) || [];
+    } catch (labsError) {
+      // Se a tabela não existir, todos pacientes estarão sem laboratoriais
+      console.log('Tabela exames_laboratoriais não existe ainda, todos pacientes estarão disponíveis');
+    }
+
+    // Filtrar pacientes que não têm laboratoriais
+    const patientsWithoutLabs = allPatients?.filter(p => !patientsWithLabs.includes(p.id)) || [];
+
+    return { data: patientsWithoutLabs, error: null };
   } catch (error) {
     return { data: [], error };
   }
