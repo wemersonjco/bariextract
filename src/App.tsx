@@ -53,12 +53,11 @@ import { PatientData, CSV_HEADERS, ExamesLaboratoriais } from './types';
 import { extractPatientData } from './services/geminiService';
 import { extractExamesLaboratoriais } from './services/examesLaboratoriaisService';
 import { normalizarDatasPaciente } from './utils/dataUtils';
-import { supabase, isSupabaseConfigured } from './services/supabaseService';
 import { 
   getPacientesSemLaboratoriais,
   saveExamesLaboratoriais,
-  checkPacienteTemLaboratoriais,
-  getExamesLaboratoriais
+  getExamesLaboratoriais,
+  converterDataParaExibicao
 } from './services/examesSupabaseService';
 import ExtraçãoComplementar from './components/ExtraçãoComplementar';
 
@@ -617,7 +616,7 @@ export default function App() {
         const { data: labData } = await getExamesLaboratoriais(paciente.id);
         labsData.push([
           paciente.nome,
-          labData?.data_lab_pre || '',
+          converterDataParaExibicao(labData?.data_lab_pre) || '',
           labData?.fonte_lab_pre || '',
           labData?.hb_pre || '',
           labData?.plaquetas_pre || '',

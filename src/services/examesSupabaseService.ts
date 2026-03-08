@@ -19,6 +19,39 @@ type PacienteSimples = {
   data_cirurgia: string;
 };
 
+// Função para converter data DD/MM/YYYY para YYYY-MM-DD (formato do Supabase)
+const converterDataParaSupabase = (data: string | undefined | null): string | null => {
+  if (!data || data.trim() === '') return null;
+  
+  // Remove espaços e verifica se está no formato DD/MM/YYYY
+  const dataLimpa = data.trim();
+  const regexData = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+  
+  if (!regexData.test(dataLimpa)) {
+    console.warn('Data inválida, mantendo original:', data);
+    return dataLimpa; // Retorna original se não for DD/MM/YYYY
+  }
+  
+  const [, dia, mes, ano] = dataLimpa.match(regexData) || [];
+  return `${ano}-${mes}-${dia}`;
+};
+
+// Função para converter data YYYY-MM-DD para DD/MM/YYYY (formato brasileiro)
+export const converterDataParaExibicao = (data: string | undefined | null): string => {
+  if (!data || data.trim() === '') return '';
+  
+  // Remove espaços e verifica se está no formato YYYY-MM-DD
+  const dataLimpa = data.trim();
+  const regexData = /^(\d{4})-(\d{2})-(\d{2})$/;
+  
+  if (!regexData.test(dataLimpa)) {
+    return dataLimpa; // Retorna original se não for YYYY-MM-DD
+  }
+  
+  const [, ano, mes, dia] = dataLimpa.match(regexData) || [];
+  return `${dia}/${mes}/${ano}`;
+};
+
 // Funções para exames laboratoriais
 export const saveExamesLaboratoriais = async (
   patientId: string, 
@@ -29,13 +62,17 @@ export const saveExamesLaboratoriais = async (
   }
 
   try {
+    // Converter datas para formato do Supabase antes de salvar
+    const dadosParaSalvar = {
+      patient_id: patientId,
+      ...examesData,
+      data_lab_pre: converterDataParaSupabase(examesData.data_lab_pre),
+      updated_at: new Date().toISOString()
+    };
+
     const { error } = await supabase
       .from('exames_laboratoriais')
-      .upsert({
-        patient_id: patientId,
-        ...examesData,
-        updated_at: new Date().toISOString()
-      }, {
+      .upsert(dadosParaSalvar, {
         onConflict: 'patient_id'
       });
 
