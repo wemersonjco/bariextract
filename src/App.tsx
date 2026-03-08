@@ -57,7 +57,8 @@ import {
   getPacientesSemLaboratoriais,
   saveExamesLaboratoriais,
   getExamesLaboratoriais,
-  converterDataParaExibicao
+  converterDataParaExibicao,
+  isSupabaseConfigured
 } from './services/examesSupabaseService';
 import ExtraçãoComplementar from './components/ExtraçãoComplementar';
 
