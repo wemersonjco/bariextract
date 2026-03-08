@@ -4,6 +4,29 @@ import { normalizarDatasPaciente } from "../utils/dataUtils";
 
 const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_KEY || "" });
 
+// Função para validar valores de exames laboratoriais
+const isValidLabValue = (value: any): boolean => {
+  // Deve ser número
+  if (typeof value !== 'number') return false;
+  
+  // Não pode ser nulo ou indefinido
+  if (value === null || value === undefined) return false;
+  
+  // Não pode ser NaN
+  if (isNaN(value)) return false;
+  
+  // Não pode ser valores inválidos comuns
+  if (value === -0.5 || value === -1 || value === 0 && value !== 0) return false;
+  
+  // Valores razoáveis para exames laboratoriais
+  if (value < 0) return false; // Exames não podem ser negativos
+  
+  // Limites máximos razoáveis para cada tipo de exame
+  if (value > 100000) return false; // Valores muito altos provavelmente são erros
+  
+  return true;
+};
+
 export const extractExamesLaboratoriais = async (
   input: { text?: string, file?: { data: string, mimeType: string } },
   retryCount = 0
@@ -162,27 +185,27 @@ Formate datas como DD/MM/AAAA.` }
     const sanitizedData: Partial<ExamesLaboratoriais> = {
       data_lab_pre: (typeof examesData.data_lab_pre === 'string' ? examesData.data_lab_pre.trim() : '') || '',
       fonte_lab_pre: (typeof examesData.fonte_lab_pre === 'string' ? examesData.fonte_lab_pre.trim() : '') || '',
-      hb_pre: typeof examesData.hb_pre === 'number' ? examesData.hb_pre : undefined,
-      plaquetas_pre: typeof examesData.plaquetas_pre === 'number' ? examesData.plaquetas_pre : undefined,
-      tgo_pre: typeof examesData.tgo_pre === 'number' ? examesData.tgo_pre : undefined,
-      tgp_pre: typeof examesData.tgp_pre === 'number' ? examesData.tgp_pre : undefined,
-      ggt_pre: typeof examesData.ggt_pre === 'number' ? examesData.ggt_pre : undefined,
-      glicemia_pre: typeof examesData.glicemia_pre === 'number' ? examesData.glicemia_pre : undefined,
-      hba1c_pre: typeof examesData.hba1c_pre === 'number' ? examesData.hba1c_pre : undefined,
-      creatinina_pre: typeof examesData.creatinina_pre === 'number' ? examesData.creatinina_pre : undefined,
-      ureia_pre: typeof examesData.ureia_pre === 'number' ? examesData.ureia_pre : undefined,
-      ct_pre: typeof examesData.ct_pre === 'number' ? examesData.ct_pre : undefined,
-      hdl_pre: typeof examesData.hdl_pre === 'number' ? examesData.hdl_pre : undefined,
-      ldl_pre: typeof examesData.ldl_pre === 'number' ? examesData.ldl_pre : undefined,
-      tg_pre: typeof examesData.tg_pre === 'number' ? examesData.tg_pre : undefined,
-      vit_b12_pre: typeof examesData.vit_b12_pre === 'number' ? examesData.vit_b12_pre : undefined,
-      vit_d_pre: typeof examesData.vit_d_pre === 'number' ? examesData.vit_d_pre : undefined,
-      ferro_pre: typeof examesData.ferro_pre === 'number' ? examesData.ferro_pre : undefined,
-      ferritina_pre: typeof examesData.ferritina_pre === 'number' ? examesData.ferritina_pre : undefined,
-      tsh_pre: typeof examesData.tsh_pre === 'number' ? examesData.tsh_pre : undefined,
-      t4l_pre: typeof examesData.t4l_pre === 'number' ? examesData.t4l_pre : undefined,
-      albumina_pre: typeof examesData.albumina_pre === 'number' ? examesData.albumina_pre : undefined,
-      insulina_pre: typeof examesData.insulina_pre === 'number' ? examesData.insulina_pre : undefined
+      hb_pre: isValidLabValue(examesData.hb_pre) ? examesData.hb_pre : undefined,
+      plaquetas_pre: isValidLabValue(examesData.plaquetas_pre) ? examesData.plaquetas_pre : undefined,
+      tgo_pre: isValidLabValue(examesData.tgo_pre) ? examesData.tgo_pre : undefined,
+      tgp_pre: isValidLabValue(examesData.tgp_pre) ? examesData.tgp_pre : undefined,
+      ggt_pre: isValidLabValue(examesData.ggt_pre) ? examesData.ggt_pre : undefined,
+      glicemia_pre: isValidLabValue(examesData.glicemia_pre) ? examesData.glicemia_pre : undefined,
+      hba1c_pre: isValidLabValue(examesData.hba1c_pre) ? examesData.hba1c_pre : undefined,
+      creatinina_pre: isValidLabValue(examesData.creatinina_pre) ? examesData.creatinina_pre : undefined,
+      ureia_pre: isValidLabValue(examesData.ureia_pre) ? examesData.ureia_pre : undefined,
+      ct_pre: isValidLabValue(examesData.ct_pre) ? examesData.ct_pre : undefined,
+      hdl_pre: isValidLabValue(examesData.hdl_pre) ? examesData.hdl_pre : undefined,
+      ldl_pre: isValidLabValue(examesData.ldl_pre) ? examesData.ldl_pre : undefined,
+      tg_pre: isValidLabValue(examesData.tg_pre) ? examesData.tg_pre : undefined,
+      vit_b12_pre: isValidLabValue(examesData.vit_b12_pre) ? examesData.vit_b12_pre : undefined,
+      vit_d_pre: isValidLabValue(examesData.vit_d_pre) ? examesData.vit_d_pre : undefined,
+      ferro_pre: isValidLabValue(examesData.ferro_pre) ? examesData.ferro_pre : undefined,
+      ferritina_pre: isValidLabValue(examesData.ferritina_pre) ? examesData.ferritina_pre : undefined,
+      tsh_pre: isValidLabValue(examesData.tsh_pre) ? examesData.tsh_pre : undefined,
+      t4l_pre: isValidLabValue(examesData.t4l_pre) ? examesData.t4l_pre : undefined,
+      albumina_pre: isValidLabValue(examesData.albumina_pre) ? examesData.albumina_pre : undefined,
+      insulina_pre: isValidLabValue(examesData.insulina_pre) ? examesData.insulina_pre : undefined
     };
 
     // Normalizar datas para formato DD/MM/YYYY
