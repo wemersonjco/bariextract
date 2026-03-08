@@ -397,6 +397,33 @@ export default function App() {
         const pacienteNormalizado = normalizarDatasPaciente(newPatient);
         newPatientsList.push(pacienteNormalizado);
 
+        // Extrair e salvar laboratoriais se houver dados relevantes
+        try {
+          const examesLaboratoriais = await extractExamesLaboratoriais(itemsToProcess[i]);
+          
+          // Verificar se há algum dado de laboratorial para salvar
+          const hasLabData = Object.values(examesLaboratoriais).some(val => 
+            val !== null && val !== undefined && val !== ''
+          );
+          
+          if (hasLabData) {
+            const { error: labError } = await saveExamesLaboratoriais(
+              pacienteNormalizado.id, 
+              examesLaboratoriais
+            );
+            
+            if (labError) {
+              console.error('Erro ao salvar laboratoriais:', labError);
+              // Não falhar completamente, apenas logar o erro
+            } else {
+              console.log('Laboratoriais salvos com sucesso para paciente:', pacienteNormalizado.nome);
+            }
+          }
+        } catch (labError) {
+          console.error('Erro na extração de laboratoriais:', labError);
+          // Não falhar completamente, apenas logar o erro
+        }
+
         // Save to Supabase if configured
         if (isSupabaseConfigured()) {
           const { error } = await supabase

@@ -113,7 +113,23 @@ export default function ExtraçãoComplementar({ onClose, onSuccess }: Extraçã
       
       if (error) {
         console.error('Erro ao salvar laboratoriais:', error);
-        setErrorMessage('Erro ao salvar exames laboratoriais');
+        
+        // Mensagem de erro mais específica
+        let errorMessage = 'Erro ao salvar exames laboratoriais';
+        
+        if (error.message?.includes('permission denied')) {
+          errorMessage = 'Erro de permissão no banco de dados. Verifique as políticas RLS no Supabase.';
+        } else if (error.message?.includes('relation "exames_laboratoriais" does not exist')) {
+          errorMessage = 'Tabela exames_laboratoriais não existe. Execute o SQL de criação no Supabase.';
+        } else if (error.message?.includes('column') && error.message?.includes('does not exist')) {
+          errorMessage = 'Erro de coluna na tabela. Verifique se o SQL foi executado corretamente.';
+        } else if (error.message?.includes('foreign key')) {
+          errorMessage = 'Erro de chave estrangeira. Verifique se o paciente existe na tabela patients.';
+        } else if (error.message) {
+          errorMessage = `Erro: ${error.message}`;
+        }
+        
+        setErrorMessage(errorMessage);
         setStatus('error');
       } else {
         setStatus('success');
