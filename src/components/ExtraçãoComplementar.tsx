@@ -20,13 +20,13 @@ import {
 } from '../services/examesSupabaseService';
 import { ExamesLaboratoriais } from '../types';
 
-interface PacienteSimples {
+type PacienteSimples = {
   id: string;
   num: string;
   nome: string;
   prontuario: string;
-  dataCirurgia: string;
-}
+  data_cirurgia: string;
+};
 
 interface ExtraçãoComplementarProps {
   onClose: () => void;
@@ -228,7 +228,7 @@ export default function ExtraçãoComplementar({ onClose, onSuccess }: Extraçã
                           </div>
                           <div className="flex items-center space-x-2 text-sm text-gray-600">
                             <Calendar className="w-4 h-4" />
-                            <span>{paciente.dataCirurgia || 'Sem data'}</span>
+                            <span>{paciente.data_cirurgia || 'Sem data'}</span>
                           </div>
                         </div>
                       </div>

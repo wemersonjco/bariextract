@@ -10,6 +10,15 @@ export const isSupabaseConfigured = (): boolean => {
   return !!(supabaseUrl && supabaseAnonKey);
 };
 
+// Tipo para compatibilidade com banco de dados
+type PacienteSimples = {
+  id: string;
+  num: string;
+  nome: string;
+  prontuario: string;
+  data_cirurgia: string;
+};
+
 // Funções para exames laboratoriais
 export const saveExamesLaboratoriais = async (
   patientId: string, 
@@ -57,7 +66,7 @@ export const getExamesLaboratoriais = async (
 };
 
 export const getPacientesSemLaboratoriais = async (): Promise<{ 
-  data: Array<Pick<PatientData, 'id' | 'num' | 'nome' | 'prontuario' | 'dataCirurgia'>>, 
+  data: PacienteSimples[], 
   error: any 
 }> => {
   if (!isSupabaseConfigured()) {
@@ -73,7 +82,7 @@ export const getPacientesSemLaboratoriais = async (): Promise<{
         num,
         nome,
         prontuario,
-        dataCirurgia
+        data_cirurgia
       `)
       .order('nome', { ascending: true });
 
