@@ -95,6 +95,36 @@ export interface PatientData {
   lastEditedAt: string;
 }
 
+export interface ExamesLaboratoriais {
+  id?: string;
+  patient_id: string;
+  data_lab_pre?: string;
+  fonte_lab_pre?: string;
+  hb_pre?: number;
+  plaquetas_pre?: number;
+  tgo_pre?: number;
+  tgp_pre?: number;
+  ggt_pre?: number;
+  glicemia_pre?: number;
+  hba1c_pre?: number;
+  creatinina_pre?: number;
+  ureia_pre?: number;
+  ct_pre?: number;
+  hdl_pre?: number;
+  ldl_pre?: number;
+  tg_pre?: number;
+  vit_b12_pre?: number;
+  vit_d_pre?: number;
+  ferro_pre?: number;
+  ferritina_pre?: number;
+  tsh_pre?: number;
+  t4l_pre?: number;
+  albumina_pre?: number;
+  insulina_pre?: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export const CSV_HEADERS = [
   "Nº", "Nome Paciente", "ID Prontuário", "Sexo", "Idade (anos) 1ª Consulta", "Município", "Estado Civil", "Nº Filhos", "Ocupação", "Escolaridade", "Cuidador Pós-op", "Data 1ª Consulta", "Data Emissão AIH", "Tempo Protocolo (dias)", "Data Cirurgia", "Idade na Cirurgia (anos)", "Tipo Cirurgia", "Peso Inicial (kg)", "Peso Último Pré-op (kg)", "Variação Peso Pré-op (kg)", "Altura (m)", "IMC Inicial (kg/m²)", "IMC Último Pré-op (kg/m²)", "Expectativa de Peso (kg)", "Perda Esperada (%),", "Tabagismo", "Etilismo (tipo/freq)", "Atividade Física Pré", "Comer Emocional", "Autoavaliação Psicológica", "Obesidade Desde", "Tentativas Emagrecimento", "Cirurgias Prévias",  "HAS", "DM2 / HbA1c Diagnóstico", "Dislipidemia", "Esteatose Hepática (grau)", "Colelitíase Pré", "Asma / Broncoespasmo", "Outras Comorbidades", "Medicações em Uso", "H. Pylori (resultado)", "H. Pylori (situação)", "EDA (resultado)", "Fez colonoscopia?", "Resultado Colonoscopia", "Outras Alterações GI", "USG Abdome", "Espirometria (resultado)", "RX Tórax", "ECO - FE (%)", "ECO - PSAP (mmHg)", "ECO - Outras Alterações", "Risco Pulmonar", "Risco CV (Lee)", "Clexane Dose (mg)", "HbA1c (%)", "Glicemia Jejum (mg/dL)", "TSH (µUI/mL)", "T4 Livre (ng/dL)", "B12 (pg/mL)", "Vitamina D (ng/mL)", "Colesterol Total (mg/dL)", "HDL (mg/dL)", "LDL (mg/dL)", "Triglicerídeos (mg/dL)", "TGO (U/L)", "TGP (U/L)", "Peso PO 9 dias (kg)", "Peso PO 40 dias (kg)", "Peso PO 4,5 meses (kg)", "Peso PO 5 meses (kg)", "Peso PO 7 meses (kg)", "Peso PO 11 meses (kg)", "Peso 1 Ano PO (kg)", "Perda Absoluta 1 Ano (kg)", "% Excesso Peso Perdido", "Atividade Física 1 Ano PO", "Excesso de Pele", "Complicações PO", "Adesão Suplementação", "Alta CB", "Observações Clínicas Relevantes", "Último IMC", "EDA Pós Data", "EDA Pós Urease", "EDA Pós H. Pylori", "EDA Pós Achados", "USG Pós Data", "USG Pós Vesícula", "USG Pós Obs", "Última Edição"
 ];

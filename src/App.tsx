@@ -49,10 +49,18 @@ import {
 } from 'chart.js';
 import { Pie, Bar, Line } from 'react-chartjs-2';
 import { format, differenceInMonths, differenceInYears, parse } from 'date-fns';
-import { PatientData, CSV_HEADERS } from './types';
+import { PatientData, CSV_HEADERS, ExamesLaboratoriais } from './types';
 import { extractPatientData } from './services/geminiService';
+import { extractExamesLaboratoriais } from './services/examesLaboratoriaisService';
 import { normalizarDatasPaciente } from './utils/dataUtils';
 import { supabase, isSupabaseConfigured } from './services/supabaseService';
+import { 
+  getPacientesSemLaboratoriais,
+  saveExamesLaboratoriais,
+  checkPacienteTemLaboratoriais,
+  getExamesLaboratoriais
+} from './services/examesSupabaseService';
+import ExtraçãoComplementar from './components/ExtraçãoComplementar';
 
 ChartJS.register(
   ArcElement, 
@@ -83,6 +91,8 @@ export default function App() {
   const [isAnimating, setIsAnimating] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showExtraçãoComplementar, setShowExtraçãoComplementar] = useState(false);
+  const [extractionMode, setExtractionMode] = useState<'completa' | 'complementar'>('completa');
 
   // Load patients from Supabase
   React.useEffect(() => {
@@ -730,6 +740,81 @@ export default function App() {
     }
   };
 
+  const handleExtraçãoComplementar = async (patientId: string, prontuarioText: string) => {
+    if (!prontuarioText.trim()) {
+      alert('Cole o texto do prontuário para extrair os laboratoriais');
+      return;
+    }
+
+    setIsProcessing(true);
+    setProgress(0);
+    setRetryStatus('');
+
+    // Intercept console.warn para capturar status de retry
+    const originalConsoleWarn = console.warn;
+    console.warn = (message: any) => {
+      if (typeof message === 'string' && message.includes('tentativa')) {
+        setRetryStatus(message);
+      }
+      originalConsoleWarn(message);
+    };
+
+    try {
+      // Verificar se já tem laboratoriais
+      const { hasLabs } = await checkPacienteTemLaboratoriais(patientId);
+      
+      if (hasLabs) {
+        const confirmOverwrite = window.confirm(
+          'Este paciente já possui exames laboratoriais cadastrados. Deseja sobrescrever os dados existentes?'
+        );
+        if (!confirmOverwrite) {
+          setIsProcessing(false);
+          return;
+        }
+      }
+
+      // Extrair laboratoriais
+      const examesData = await extractExamesLaboratoriais({
+        text: prontuarioText
+      });
+
+      // Salvar no banco
+      const { error } = await saveExamesLaboratoriais(patientId, examesData);
+      
+      if (error) {
+        console.error('Erro ao salvar laboratoriais:', error);
+        alert('Erro ao salvar exames laboratoriais');
+      } else {
+        alert('Laboratoriais extraídos e salvos com sucesso!');
+        setShowExtraçãoComplementar(false);
+      }
+    } catch (error: any) {
+      console.error('Erro no processamento:', error);
+      
+      // Mensagens de erro específicas
+      if (error.message?.includes("Chave da API Gemini não configurada")) {
+        alert('Erro: Chave da API Gemini não configurada. Verifique o arquivo .env e adicione sua chave VITE_GEMINI_KEY.');
+      } else if (error.message?.includes("Chave da API Gemini inválida")) {
+        alert('Erro: Chave da API Gemini inválida ou expirada. Verifique sua chave e tente novamente.');
+      } else if (error.message?.includes("Erro de conexão")) {
+        alert('Erro: Falha na conexão com a API. Verifique sua conexão com a internet e tente novamente.');
+      } else if (error.message?.includes("Nenhum modelo Gemini disponível") || error.message?.includes("is not found")) {
+        alert('Erro: Nenhum modelo Gemini disponível foi encontrado. Isso pode ser um problema temporário da API. Tente novamente em alguns minutos.');
+      } else if (error.message?.includes("modelo Gemini está temporariamente indisponível") || error.message?.includes("alta demanda")) {
+        alert('O modelo Gemini está temporariamente indisponível devido à alta demanda. O sistema tentará novamente automaticamente. Por favor, aguarde alguns instantes.');
+      } else if (error.message?.includes("429") || error.message?.includes("RESOURCE_EXHAUSTED")) {
+        alert('Limite de uso do Gemini atingido. Por favor, aguarde um momento e tente novamente com menos arquivos.');
+      } else {
+        alert(`Erro ao processar exames laboratoriais: ${error.message}`);
+      }
+    } finally {
+      console.warn = originalConsoleWarn;
+      setIsProcessing(false);
+      setProgress(0);
+      setRetryStatus('');
+    }
+  };
+
   const filteredPatients = patients.filter(p => 
     p.nome.toLowerCase().includes(searchTerm.toLowerCase()) || 
     p.prontuario.includes(searchTerm)
@@ -1085,6 +1170,26 @@ export default function App() {
                         <p className="text-xs text-gray-500">Cole o texto ou arraste o arquivo do paciente</p>
                       </div>
                     </div>
+                    <div className="flex gap-2 mb-4">
+                      <button
+                        onClick={() => setExtractionMode('completa')}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all ${
+                          extractionMode === 'completa' 
+                            ? 'bg-emerald-600 text-white' 
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span className="text-sm">Nova Extração Completa</span>
+                      </button>
+                      <button
+                        onClick={() => setShowExtraçãoComplementar(true)}
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all bg-blue-600 text-white hover:bg-blue-700"
+                      >
+                        <FileText className="w-4 h-4" />
+                        <span className="text-sm">Extração Complementar (Laboratoriais)</span>
+                      </button>
+                    </div>
                     <div className="flex gap-2">
                       <button 
                         onClick={() => {
@@ -1351,6 +1456,19 @@ Apto para cirurgia após liberação da cardiologia e nutrição.`);
           </div>
         </main>
       </div>
+
+      {/* Modal de Extração Complementar */}
+      <AnimatePresence>
+        {showExtraçãoComplementar && (
+          <ExtraçãoComplementar
+            onClose={() => setShowExtraçãoComplementar(false)}
+            onSuccess={() => {
+              // Poderia recarregar dados ou mostrar mensagem de sucesso
+              setShowExtraçãoComplementar(false);
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
