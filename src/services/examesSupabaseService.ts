@@ -20,7 +20,7 @@ type PacienteSimples = {
 };
 
 // Função para converter data DD/MM/YYYY para YYYY-MM-DD (formato do Supabase)
-const converterDataParaSupabase = (data: string | undefined | null): string | null => {
+export const converterDataParaSupabase = (data: string | undefined | null): string | null => {
   if (!data || data.trim() === '') return null;
   
   // Remove espaços e verifica se está no formato DD/MM/YYYY

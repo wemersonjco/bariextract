@@ -58,7 +58,9 @@ import {
   saveExamesLaboratoriais,
   getExamesLaboratoriais,
   converterDataParaExibicao,
-  isSupabaseConfigured
+  converterDataParaSupabase,
+  isSupabaseConfigured,
+  supabase
 } from './services/examesSupabaseService';
 import ExtraçãoComplementar from './components/ExtraçãoComplementar';
 
@@ -867,7 +869,13 @@ export default function App() {
 
     try {
       // Verificar se já tem laboratoriais
-      const { hasLabs } = await checkPacienteTemLaboratoriais(patientId);
+      const { data: existingLabs } = await getExamesLaboratoriais(patientId);
+      const hasLabs = existingLabs && Object.keys(existingLabs).some(key => 
+        key !== 'patient_id' && key !== 'id' && key !== 'created_at' && key !== 'updated_at' &&
+        existingLabs[key as keyof typeof existingLabs] !== null && 
+        existingLabs[key as keyof typeof existingLabs] !== undefined && 
+        existingLabs[key as keyof typeof existingLabs] !== ''
+      );
       
       if (hasLabs) {
         const confirmOverwrite = window.confirm(
