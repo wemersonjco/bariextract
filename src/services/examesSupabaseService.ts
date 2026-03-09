@@ -24,7 +24,20 @@ const converterDataParaSupabase = (data: string | undefined | null): string | nu
   if (!data || data.trim() === '') return null;
   
   // Remove espaços e verifica se está no formato DD/MM/YYYY
-  const dataLimpa = data.trim();
+  let dataLimpa = data.trim();
+  
+  // Se for um intervalo de datas, pega apenas a primeira data
+  if (dataLimpa.includes(' a ') || dataLimpa.includes(' até ') || dataLimpa.includes(' - ')) {
+    const separadores = [' a ', ' até ', ' - ', ' ao '];
+    for (const sep of separadores) {
+      if (dataLimpa.includes(sep)) {
+        dataLimpa = dataLimpa.split(sep)[0].trim();
+        break;
+      }
+    }
+    console.log('Intervalo de datas detectado, usando primeira data:', data, '→', dataLimpa);
+  }
+  
   const regexData = /^(\d{2})\/(\d{2})\/(\d{4})$/;
   
   if (!regexData.test(dataLimpa)) {
@@ -41,7 +54,19 @@ export const converterDataParaExibicao = (data: string | undefined | null): stri
   if (!data || data.trim() === '') return '';
   
   // Remove espaços e verifica se está no formato YYYY-MM-DD
-  const dataLimpa = data.trim();
+  let dataLimpa = data.trim();
+  
+  // Se for um intervalo de datas, pega apenas a primeira data
+  if (dataLimpa.includes(' a ') || dataLimpa.includes(' até ') || dataLimpa.includes(' - ')) {
+    const separadores = [' a ', ' até ', ' - ', ' ao '];
+    for (const sep of separadores) {
+      if (dataLimpa.includes(sep)) {
+        dataLimpa = dataLimpa.split(sep)[0].trim();
+        break;
+      }
+    }
+  }
+  
   const regexData = /^(\d{4})-(\d{2})-(\d{2})$/;
   
   if (!regexData.test(dataLimpa)) {

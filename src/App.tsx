@@ -97,15 +97,22 @@ export default function App() {
   // Load patients from Supabase
   React.useEffect(() => {
     const loadPatients = async () => {
+      console.log('Iniciando loadPatients...');
+      console.log('isSupabaseConfigured:', isSupabaseConfigured());
+      
       if (!isSupabaseConfigured()) {
+        console.log('Supabase não configurado, setando isLoading false');
         setIsLoading(false);
         return;
       }
       try {
+        console.log('Buscando pacientes do Supabase...');
         const { data, error } = await supabase
           .from('patients')
           .select('*')
           .order('created_at', { ascending: false });
+        
+        console.log('Resultado Supabase:', { data: data?.length || 0, error });
         
         if (error) throw error;
         
@@ -206,10 +213,12 @@ export default function App() {
           lastEditedAt: p.last_edited_at || ''
         }));
         
+        console.log('Pacientes mapeados:', mappedData.length);
         setPatients(mappedData);
       } catch (e) {
         console.error('Erro ao carregar pacientes:', e);
       } finally {
+        console.log('loadPatients finalizado, setando isLoading false');
         setIsLoading(false);
       }
     };
@@ -257,10 +266,21 @@ export default function App() {
   });
 
   const handleProcess = async () => {
+    console.log('=== handleProcess iniciado ===');
+    console.log('currentRecord:', currentRecord.trim());
+    console.log('currentFiles:', currentFiles.length);
+    console.log('isProcessing:', isProcessing);
+    
     const hasText = currentRecord.trim().length > 0;
     const hasFiles = currentFiles.length > 0;
     
-    if (!hasText && !hasFiles) return;
+    console.log('hasText:', hasText);
+    console.log('hasFiles:', hasFiles);
+    
+    if (!hasText && !hasFiles) {
+      console.log('Retornando early: não há texto nem arquivos');
+      return;
+    }
     
     setIsProcessing(true);
     setProgress(0);
@@ -397,6 +417,16 @@ export default function App() {
         const pacienteNormalizado = normalizarDatasPaciente(newPatient);
         newPatientsList.push(pacienteNormalizado);
 
+        // Converter datas para formato do Supabase (YYYY-MM-DD) antes de salvar
+        const pacienteParaBanco = {
+          ...pacienteNormalizado,
+          dataPrimeiraConsulta: converterDataParaSupabase(pacienteNormalizado.dataPrimeiraConsulta),
+          dataEmissaoAIH: converterDataParaSupabase(pacienteNormalizado.dataEmissaoAIH),
+          dataCirurgia: converterDataParaSupabase(pacienteNormalizado.dataCirurgia),
+          edaPosData: converterDataParaSupabase(pacienteNormalizado.edaPosData),
+          usgPosData: converterDataParaSupabase(pacienteNormalizado.usgPosData)
+        };
+
         // Extrair e salvar laboratoriais se houver dados relevantes
         try {
           const examesLaboratoriais = await extractExamesLaboratoriais(itemsToProcess[i]);
@@ -429,98 +459,98 @@ export default function App() {
           const { error } = await supabase
             .from('patients')
             .insert([{
-              num: pacienteNormalizado.num,
-              nome: pacienteNormalizado.nome,
-              prontuario: pacienteNormalizado.prontuario,
-              sexo: pacienteNormalizado.sexo,
-              idade_primeira_consulta: pacienteNormalizado.idadePrimeiraConsulta,
-              municipio: pacienteNormalizado.municipio,
-              estado_civil: pacienteNormalizado.estadoCivil,
-              num_filhos: pacienteNormalizado.numFilhos,
-              ocupacao: pacienteNormalizado.ocupacao,
-              escolaridade: pacienteNormalizado.escolaridade,
-              cuidador_pos_op: pacienteNormalizado.cuidadorPosOp,
-              data_primeira_consulta: pacienteNormalizado.dataPrimeiraConsulta,
-              data_emissao_aih: pacienteNormalizado.dataEmissaoAIH,
-              tempo_protocolo: pacienteNormalizado.tempoProtocolo,
-              data_cirurgia: pacienteNormalizado.dataCirurgia,
-              idade_na_cirurgia: pacienteNormalizado.idadeNaCirurgia,
-              tipo_cirurgia: pacienteNormalizado.tipoCirurgia,
-              peso_inicial: pacienteNormalizado.pesoInicial,
-              peso_ultimo_pre_op: pacienteNormalizado.pesoUltimoPreOp,
-              variacao_peso_pre_op: pacienteNormalizado.variacaoPesoPreOp,
-              altura: pacienteNormalizado.altura,
-              imc_inicial: pacienteNormalizado.imcInicial,
-              imc_ultimo_pre_op: pacienteNormalizado.imcUltimoPreOp,
-              expectativa_peso: pacienteNormalizado.expectativaPeso,
-              perda_esperada: pacienteNormalizado.perdaEsperada,
-              tabagismo: pacienteNormalizado.tabagismo,
-              etilismo: pacienteNormalizado.etilismo,
-              atividade_fisica_pre: pacienteNormalizado.atividadeFisicaPre,
-              comer_emocional: pacienteNormalizado.comerEmocional,
-              autoavaliacao_psicologica: pacienteNormalizado.autoavaliacaoPsicologica,
-              obesidade_desde: pacienteNormalizado.obesidadeDesde,
-              tentativas_emagrecimento: pacienteNormalizado.tentativasEmagrecimento,
-              cirurgias_previas: pacienteNormalizado.cirurgiasPrevias,
-              has: pacienteNormalizado.has,
-              dm2: pacienteNormalizado.dm2,
-              dislipidemia: pacienteNormalizado.dislipidemia,
-              esteatose_hepatica: pacienteNormalizado.esteatoseHepatica,
-              colelitiase_pre: pacienteNormalizado.colelitiasePre,
-              asma: pacienteNormalizado.asma,
-              outras_comorbidades: pacienteNormalizado.outrasComorbidades,
-              medicacoes_em_uso: pacienteNormalizado.medicacoesEmUso,
-              h_pylori_resultado: pacienteNormalizado.hPyloriResultado,
-              h_pylori_situacao: pacienteNormalizado.hPyloriSituacao,
-              eda_resultado: pacienteNormalizado.edaResultado,
-              fez_colonoscopia: pacienteNormalizado.fezColonoscopia,
-              resultado_colonoscopia: pacienteNormalizado.resultadoColonoscopia,
-              outras_alteracoes_gi: pacienteNormalizado.outrasAlteracoesGI,
-              usg_abdome: pacienteNormalizado.usgAbdome,
-              espirometria_resultado: pacienteNormalizado.espirometriaResultado,
-              rx_torax: pacienteNormalizado.rxTorax,
-              eco_fe: pacienteNormalizado.ecoFE,
-              eco_psap: pacienteNormalizado.ecoPSAP,
-              eco_outras_alteracoes: pacienteNormalizado.ecoOutrasAlteracoes,
-              risco_pulmonar: pacienteNormalizado.riscoPulmonar,
-              risco_cv: pacienteNormalizado.riscoCV,
-              clexane_dose: pacienteNormalizado.clexaneDose,
-              hba1c: pacienteNormalizado.hbA1c,
-              glicemia_jejum: pacienteNormalizado.glicemiaJejum,
-              tsh: pacienteNormalizado.tsh,
-              t4_livre: pacienteNormalizado.t4Livre,
-              b12: pacienteNormalizado.b12,
-              vitamina_d: pacienteNormalizado.vitaminaD,
-              colesterol_total: pacienteNormalizado.colesterolTotal,
-              hdl: pacienteNormalizado.hdl,
-              ldl: pacienteNormalizado.ldl,
-              triglicerideos: pacienteNormalizado.triglicerideos,
-              tgo: pacienteNormalizado.tgo,
-              tgp: pacienteNormalizado.tgp,
-              peso_po_9dias: pacienteNormalizado.pesoPO9dias,
-              peso_po_40dias: pacienteNormalizado.pesoPO40dias,
-              peso_po_4_5meses: pacienteNormalizado.pesoPO4_5meses,
-              peso_po_5meses: pacienteNormalizado.pesoPO5meses,
-              peso_po_7meses: pacienteNormalizado.pesoPO7meses,
-              peso_po_11meses: pacienteNormalizado.pesoPO11meses,
-              peso_1ano_po: pacienteNormalizado.peso1AnoPO,
-              perda_absoluta_1ano: pacienteNormalizado.perdaAbsoluta1Ano,
-              percent_excesso_peso_perdido: pacienteNormalizado.percentExcessoPesoPerdido,
-              atividade_fisica_1ano_po: pacienteNormalizado.atividadeFisica1AnoPO,
-              excesso_pele: pacienteNormalizado.excessoPele,
-              complicacoes_po: pacienteNormalizado.complicacoesPO,
-              adesao_suplementacao: pacienteNormalizado.adesaoSuplementacao,
-              alta_cb: pacienteNormalizado.altaCB,
-              observacoes_clinicas: pacienteNormalizado.observacoesClinicas,
-              ultimo_imc: pacienteNormalizado.ultimoIMC,
-              eda_pos_data: pacienteNormalizado.edaPosData,
-              eda_pos_urease: pacienteNormalizado.edaPosUrease,
-              eda_pos_h_pylori: pacienteNormalizado.edaPosHPylori,
-              eda_pos_achados: pacienteNormalizado.edaPosAchados,
-              usg_pos_data: pacienteNormalizado.usgPosData,
-              usg_pos_vesicula: pacienteNormalizado.usgPosVesicula,
-              usg_pos_observacoes: pacienteNormalizado.usgPosObservacoes,
-              last_edited_at: pacienteNormalizado.lastEditedAt
+              num: pacienteParaBanco.num,
+              nome: pacienteParaBanco.nome,
+              prontuario: pacienteParaBanco.prontuario,
+              sexo: pacienteParaBanco.sexo,
+              idade_primeira_consulta: pacienteParaBanco.idadePrimeiraConsulta,
+              municipio: pacienteParaBanco.municipio,
+              estado_civil: pacienteParaBanco.estadoCivil,
+              num_filhos: pacienteParaBanco.numFilhos,
+              ocupacao: pacienteParaBanco.ocupacao,
+              escolaridade: pacienteParaBanco.escolaridade,
+              cuidador_pos_op: pacienteParaBanco.cuidadorPosOp,
+              data_primeira_consulta: pacienteParaBanco.dataPrimeiraConsulta,
+              data_emissao_aih: pacienteParaBanco.dataEmissaoAIH,
+              tempo_protocolo: pacienteParaBanco.tempoProtocolo,
+              data_cirurgia: pacienteParaBanco.dataCirurgia,
+              idade_na_cirurgia: pacienteParaBanco.idadeNaCirurgia,
+              tipo_cirurgia: pacienteParaBanco.tipoCirurgia,
+              peso_inicial: pacienteParaBanco.pesoInicial,
+              peso_ultimo_pre_op: pacienteParaBanco.pesoUltimoPreOp,
+              variacao_peso_pre_op: pacienteParaBanco.variacaoPesoPreOp,
+              altura: pacienteParaBanco.altura,
+              imc_inicial: pacienteParaBanco.imcInicial,
+              imc_ultimo_pre_op: pacienteParaBanco.imcUltimoPreOp,
+              expectativa_peso: pacienteParaBanco.expectativaPeso,
+              perda_esperada: pacienteParaBanco.perdaEsperada,
+              tabagismo: pacienteParaBanco.tabagismo,
+              etilismo: pacienteParaBanco.etilismo,
+              atividade_fisica_pre: pacienteParaBanco.atividadeFisicaPre,
+              comer_emocional: pacienteParaBanco.comerEmocional,
+              autoavaliacao_psicologica: pacienteParaBanco.autoavaliacaoPsicologica,
+              obesidade_desde: pacienteParaBanco.obesidadeDesde,
+              tentativas_emagrecimento: pacienteParaBanco.tentativasEmagrecimento,
+              cirurgias_previas: pacienteParaBanco.cirurgiasPrevias,
+              has: pacienteParaBanco.has,
+              dm2: pacienteParaBanco.dm2,
+              dislipidemia: pacienteParaBanco.dislipidemia,
+              esteatose_hepatica: pacienteParaBanco.esteatoseHepatica,
+              colelitiase_pre: pacienteParaBanco.colelitiasePre,
+              asma: pacienteParaBanco.asma,
+              outras_comorbidades: pacienteParaBanco.outrasComorbidades,
+              medicacoes_em_uso: pacienteParaBanco.medicacoesEmUso,
+              h_pylori_resultado: pacienteParaBanco.hPyloriResultado,
+              h_pylori_situacao: pacienteParaBanco.hPyloriSituacao,
+              eda_resultado: pacienteParaBanco.edaResultado,
+              fez_colonoscopia: pacienteParaBanco.fezColonoscopia,
+              resultado_colonoscopia: pacienteParaBanco.resultadoColonoscopia,
+              outras_alteracoes_gi: pacienteParaBanco.outrasAlteracoesGI,
+              usg_abdome: pacienteParaBanco.usgAbdome,
+              espirometria_resultado: pacienteParaBanco.espirometriaResultado,
+              rx_torax: pacienteParaBanco.rxTorax,
+              eco_fe: pacienteParaBanco.ecoFE,
+              eco_psap: pacienteParaBanco.ecoPSAP,
+              eco_outras_alteracoes: pacienteParaBanco.ecoOutrasAlteracoes,
+              risco_pulmonar: pacienteParaBanco.riscoPulmonar,
+              risco_cv: pacienteParaBanco.riscoCV,
+              clexane_dose: pacienteParaBanco.clexaneDose,
+              hba1c: pacienteParaBanco.hbA1c,
+              glicemia_jejum: pacienteParaBanco.glicemiaJejum,
+              tsh: pacienteParaBanco.tsh,
+              t4_livre: pacienteParaBanco.t4Livre,
+              b12: pacienteParaBanco.b12,
+              vitamina_d: pacienteParaBanco.vitaminaD,
+              colesterol_total: pacienteParaBanco.colesterolTotal,
+              hdl: pacienteParaBanco.hdl,
+              ldl: pacienteParaBanco.ldl,
+              triglicerideos: pacienteParaBanco.triglicerideos,
+              tgo: pacienteParaBanco.tgo,
+              tgp: pacienteParaBanco.tgp,
+              peso_po_9dias: pacienteParaBanco.pesoPO9dias,
+              peso_po_40dias: pacienteParaBanco.pesoPO40dias,
+              peso_po_4_5meses: pacienteParaBanco.pesoPO4_5meses,
+              peso_po_5meses: pacienteParaBanco.pesoPO5meses,
+              peso_po_7meses: pacienteParaBanco.pesoPO7meses,
+              peso_po_11meses: pacienteParaBanco.pesoPO11meses,
+              peso_1ano_po: pacienteParaBanco.peso1AnoPO,
+              perda_absoluta_1ano: pacienteParaBanco.perdaAbsoluta1Ano,
+              percent_excesso_peso_perdido: pacienteParaBanco.percentExcessoPesoPerdido,
+              atividade_fisica_1ano_po: pacienteParaBanco.atividadeFisica1AnoPO,
+              excesso_pele: pacienteParaBanco.excessoPele,
+              complicacoes_po: pacienteParaBanco.complicacoesPO,
+              adesao_suplementacao: pacienteParaBanco.adesaoSuplementacao,
+              alta_cb: pacienteParaBanco.altaCB,
+              observacoes_clinicas: pacienteParaBanco.observacoesClinicas,
+              ultimo_imc: pacienteParaBanco.ultimoIMC,
+              eda_pos_data: pacienteParaBanco.edaPosData,
+              eda_pos_urease: pacienteParaBanco.edaPosUrease,
+              eda_pos_h_pylori: pacienteParaBanco.edaPosHPylori,
+              eda_pos_achados: pacienteParaBanco.edaPosAchados,
+              usg_pos_data: pacienteParaBanco.usgPosData,
+              usg_pos_vesicula: pacienteParaBanco.usgPosVesicula,
+              usg_pos_observacoes: pacienteParaBanco.usgPosObservacoes,
+              last_edited_at: pacienteParaBanco.lastEditedAt
             }]);
           
           if (error) console.error('Erro ao salvar no Supabase:', error);
