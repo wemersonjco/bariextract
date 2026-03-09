@@ -118,11 +118,18 @@ export const getExamesLaboratoriais = async (
     const { data, error } = await supabase
       .from('exames_laboratoriais')
       .select('*')
-      .eq('patient_id', patientId)
-      .single();
+      .eq('patient_id', patientId);
 
-    return { data, error };
+    if (error) {
+      console.error('Erro ao buscar laboratoriais:', error);
+      return { data: null, error };
+    }
+
+    // Retorna o primeiro registro ou null se não encontrar
+    const laboratorial = data && data.length > 0 ? data[0] : null;
+    return { data: laboratorial, error: null };
   } catch (error) {
+    console.error('Erro na requisição de laboratoriais:', error);
     return { data: null, error };
   }
 };

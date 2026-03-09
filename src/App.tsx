@@ -284,6 +284,8 @@ export default function App() {
       return;
     }
     
+    console.log('Iniciando processamento de', hasFiles ? currentFiles.length : '1', 'item(s)');
+    
     setIsProcessing(true);
     setProgress(0);
     setRetryStatus('');
@@ -431,14 +433,23 @@ export default function App() {
 
         // Extrair e salvar laboratoriais se houver dados relevantes
         try {
+          console.log('=== Iniciando extração de laboratoriais ===');
+          console.log('Paciente:', pacienteNormalizado.nome);
+          console.log('Item para processar:', itemsToProcess[i]);
+          
           const examesLaboratoriais = await extractExamesLaboratoriais(itemsToProcess[i]);
+          
+          console.log('Exames laboratoriais extraídos:', examesLaboratoriais);
           
           // Verificar se há algum dado de laboratorial para salvar
           const hasLabData = Object.values(examesLaboratoriais).some(val => 
             val !== null && val !== undefined && val !== ''
           );
           
+          console.log('Tem dados laboratoriais?', hasLabData);
+          
           if (hasLabData) {
+            console.log('Salvando laboratoriais para paciente:', pacienteNormalizado.id);
             const { error: labError } = await saveExamesLaboratoriais(
               pacienteNormalizado.id, 
               examesLaboratoriais
@@ -450,6 +461,8 @@ export default function App() {
             } else {
               console.log('Laboratoriais salvos com sucesso para paciente:', pacienteNormalizado.nome);
             }
+          } else {
+            console.log('Nenhum dado laboratorial encontrado para salvar');
           }
         } catch (labError) {
           console.error('Erro na extração de laboratoriais:', labError);
