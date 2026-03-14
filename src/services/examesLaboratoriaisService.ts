@@ -15,11 +15,14 @@ const isValidLabValue = (value: any, fieldName?: string): boolean => {
   // Não pode ser NaN
   if (isNaN(value)) return false;
   
-  // Não pode ser valores inválidos comuns
-  if (value === -0.5 || value === -1 || value === 0 && value !== 0) return false;
+  // Aceitar -1 como "não encontrado" ou "não realizado"
+  if (value === -1) return true; // -1 significa não encontrado, salvar
+  
+  // Não pode ser valores inválidos comuns (exceto -1 que já foi tratado)
+  if (value === -0.5 || value === 0 && value !== 0) return false;
   
   // Valores razoáveis para exames laboratoriais
-  if (value < 0) return false; // Exames não podem ser negativos
+  if (value < 0 && value !== -1) return false; // Outros valores negativos não permitidos
   
   // Limites máximos específicos para cada tipo de exame
   switch (fieldName) {
@@ -28,33 +31,37 @@ const isValidLabValue = (value: any, fieldName?: string): boolean => {
     case 'hb_pre':
       return value <= 25; // Hemoglobina: até 25 g/dL
     case 'glicemia_pre':
-      return value <= 1000; // Glicemia: até 1000 mg/dL
+      return value <= 500; // Glicemia: até 500 mg/dL
+    case 'hba1c_pre':
+      return value <= 20; // HbA1c: até 20%
+    case 'creatinina_pre':
+      return value <= 20; // Creatinina: até 20 mg/dL
+    case 'ureia_pre':
+      return value <= 200; // Ureia: até 200 mg/dL
     case 'ct_pre':
-      return value <= 1000; // Colesterol total: até 1000 mg/dL
+      return value <= 500; // Colesterol total: até 500 mg/dL
+    case 'hdl_pre':
+      return value <= 200; // HDL: até 200 mg/dL
+    case 'ldl_pre':
+      return value <= 400; // LDL: até 400 mg/dL
     case 'tg_pre':
-      return value <= 5000; // Triglicerídeos: até 5000 mg/dL
+      return value <= 2000; // Triglicerídeos: até 2000 mg/dL
     case 'tgo_pre':
     case 'tgp_pre':
     case 'ggt_pre':
-      return value <= 10000; // Enzimas hepáticas: até 10.000 U/L
-    case 'creatinina_pre':
-      return value <= 50; // Creatinina: até 50 mg/dL
-    case 'ureia_pre':
-      return value <= 500; // Ureia: até 500 mg/dL
+      return value <= 1000; // TGO/TGP/GGT: até 1000 U/L
     case 'vit_b12_pre':
-      return value <= 10000; // Vitamina B12: até 10.000 pg/mL
+      return value <= 2000; // Vitamina B12: até 2000 pg/mL
     case 'vit_d_pre':
-      return value <= 1000; // Vitamina D: até 1000 ng/mL
+      return value <= 200; // Vitamina D: até 200 ng/mL
     case 'ferro_pre':
-      return value <= 1000; // Ferro: até 1000 µg/dL
+      return value <= 500; // Ferro: até 500 µg/dL
     case 'ferritina_pre':
       return value <= 10000; // Ferritina: até 10.000 ng/mL
     case 'tsh_pre':
       return value <= 100; // TSH: até 100 mUI/L
     case 't4l_pre':
       return value <= 100; // T4 livre: até 100 ng/dL
-    case 'hba1c_pre':
-      return value <= 20; // HbA1c: até 20%
     case 'albumina_pre':
       return value <= 10; // Albumina: até 10 g/dL
     case 'insulina_pre':

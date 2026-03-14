@@ -78,16 +78,25 @@ export const converterDataParaExibicao = (data: string | undefined | null): stri
 };
 
 // Funções para exames laboratoriais
-export const saveExamesLaboratoriais = async (
-  patientId: string, 
-  examesData: Partial<ExamesLaboratoriais>
-): Promise<{ error: any }> => {
-  if (!isSupabaseConfigured()) {
-    return { error: new Error('Supabase não configurado') };
-  }
+export const saveExamesLaboratoriais = async (patientId: string, examesData: Partial<ExamesLaboratoriais>): Promise<{ error: any }> => {
+  if (!isSupabaseConfigured()) return { error: new Error('Supabase não configurado') };
 
   try {
-    // Converter datas para formato do Supabase antes de salvar
+    // Primeiro, verificar se o paciente existe
+    const { data: patient, error: patientError } = await supabase
+      .from('patients')
+      .select('id')
+      .eq('id', patientId)
+      .single();
+
+    if (patientError || !patient) {
+      console.error('Paciente não encontrado:', patientId, patientError);
+      return { error: new Error('Paciente não encontrado no banco de dados') };
+    }
+
+    console.log('Paciente verificado, salvando laboratoriais...');
+    
+    // Converter datas antes de salvar
     const dadosParaSalvar = {
       patient_id: patientId,
       ...examesData,
@@ -103,6 +112,7 @@ export const saveExamesLaboratoriais = async (
 
     return { error };
   } catch (error) {
+    console.error('Erro ao salvar exames laboratoriais:', error);
     return { error };
   }
 };
