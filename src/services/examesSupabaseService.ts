@@ -86,11 +86,15 @@ export const saveExamesLaboratoriais = async (patientId: string, examesData: Par
     const { data: patient, error: patientError } = await supabase
       .from('patients')
       .select('id')
-      .eq('id', patientId)
-      .single();
+      .eq('id', patientId);
 
-    if (patientError || !patient) {
-      console.error('Paciente não encontrado:', patientId, patientError);
+    if (patientError) {
+      console.error('Erro ao buscar paciente:', patientError);
+      return { error: new Error('Erro ao verificar paciente no banco de dados') };
+    }
+
+    if (!patient || patient.length === 0) {
+      console.error('Paciente não encontrado:', patientId);
       return { error: new Error('Paciente não encontrado no banco de dados') };
     }
 

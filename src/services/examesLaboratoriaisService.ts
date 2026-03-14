@@ -15,14 +15,14 @@ const isValidLabValue = (value: any, fieldName?: string): boolean => {
   // Não pode ser NaN
   if (isNaN(value)) return false;
   
-  // Aceitar -1 como "não encontrado" ou "não realizado"
-  if (value === -1) return true; // -1 significa não encontrado, salvar
+  // Aceitar -1 e -2 como "não encontrado" ou "não realizado"
+  if (value === -1 || value === -2) return true; // -1/-2 significa não encontrado, salvar como undefined
   
   // Não pode ser valores inválidos comuns (exceto -1 que já foi tratado)
   if (value === -0.5 || value === 0 && value !== 0) return false;
   
   // Valores razoáveis para exames laboratoriais
-  if (value < 0 && value !== -1) return false; // Outros valores negativos não permitidos
+  if (value < 0 && value !== -1 && value !== -2) return false; // Outros valores negativos não permitidos
   
   // Limites máximos específicos para cada tipo de exame
   switch (fieldName) {
