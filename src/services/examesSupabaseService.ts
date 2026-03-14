@@ -82,11 +82,16 @@ export const saveExamesLaboratoriais = async (patientId: string, examesData: Par
   if (!isSupabaseConfigured()) return { error: new Error('Supabase não configurado') };
 
   try {
+    console.log('=== VERIFICANDO PACIENTE ===');
+    console.log('PatientId a verificar:', patientId);
+    
     // Primeiro, verificar se o paciente existe
     const { data: patient, error: patientError } = await supabase
       .from('patients')
-      .select('id')
+      .select('id, nome')
       .eq('id', patientId);
+
+    console.log('Resultado busca paciente:', { patient, error: patientError });
 
     if (patientError) {
       console.error('Erro ao buscar paciente:', patientError);
@@ -95,9 +100,20 @@ export const saveExamesLaboratoriais = async (patientId: string, examesData: Par
 
     if (!patient || patient.length === 0) {
       console.error('Paciente não encontrado:', patientId);
+      console.error('Tentando buscar todos os pacientes para debug...');
+      
+      // Debug: buscar todos os pacientes para ver se existe algum
+      const { data: allPatients } = await supabase
+        .from('patients')
+        .select('id, nome')
+        .limit(5);
+      
+      console.log('Primeiros 5 pacientes no banco:', allPatients);
+      
       return { error: new Error('Paciente não encontrado no banco de dados') };
     }
 
+    console.log('Paciente encontrado:', patient[0]);
     console.log('Paciente verificado, salvando laboratoriais...');
     
     // Converter datas antes de salvar

@@ -431,45 +431,9 @@ export default function App() {
           usgPosData: converterDataParaSupabase(pacienteNormalizado.usgPosData)
         };
 
-        // Extrair e salvar laboratoriais se houver dados relevantes
-        try {
-          console.log('=== Iniciando extração de laboratoriais ===');
-          console.log('Paciente:', pacienteNormalizado.nome);
-          console.log('Item para processar:', itemsToProcess[i]);
-          
-          const examesLaboratoriais = await extractExamesLaboratoriais(itemsToProcess[i]);
-          
-          console.log('Exames laboratoriais extraídos:', examesLaboratoriais);
-          
-          // Verificar se há algum dado de laboratorial para salvar
-          const hasLabData = Object.values(examesLaboratoriais).some(val => 
-            val !== null && val !== undefined && val !== ''
-          );
-          
-          console.log('Tem dados laboratoriais?', hasLabData);
-          
-          if (hasLabData) {
-            console.log('Salvando laboratoriais para paciente:', pacienteNormalizado.id);
-            const { error: labError } = await saveExamesLaboratoriais(
-              pacienteNormalizado.id, 
-              examesLaboratoriais
-            );
-            
-            if (labError) {
-              console.error('Erro ao salvar laboratoriais:', labError);
-              // Não falhar completamente, apenas logar o erro
-            } else {
-              console.log('Laboratoriais salvos com sucesso para paciente:', pacienteNormalizado.nome);
-            }
-          } else {
-            console.log('Nenhum dado laboratorial encontrado para salvar');
-          }
-        } catch (labError) {
-          console.error('Erro na extração de laboratoriais:', labError);
-          // Não falhar completamente, apenas logar o erro
-        }
-
         // Save to Supabase if configured
+        let savedPatientId = pacienteNormalizado.id;
+        
         if (isSupabaseConfigured()) {
           const { error } = await supabase
             .from('patients')
@@ -566,9 +530,54 @@ export default function App() {
               usg_pos_vesicula: pacienteParaBanco.usgPosVesicula,
               usg_pos_observacoes: pacienteParaBanco.usgPosObservacoes,
               last_edited_at: pacienteParaBanco.lastEditedAt
-            }]);
+            }])
+            .select('id')
+            .single();
+
+          if (error) {
+            console.error('Erro ao salvar no Supabase:', error);
+          } else if (data) {
+            savedPatientId = data.id; // Usar o ID retornado pelo banco
+            console.log('Paciente salvo com ID:', savedPatientId);
+          }
+        }
+
+        // AGORA extrair e salvar laboratoriais (DEPOIS de salvar o paciente)
+        try {
+          console.log('=== Iniciando extração de laboratoriais ===');
+          console.log('Paciente:', pacienteNormalizado.nome);
+          console.log('Item para processar:', itemsToProcess[i]);
           
-          if (error) console.error('Erro ao salvar no Supabase:', error);
+          const examesLaboratoriais = await extractExamesLaboratoriais(itemsToProcess[i]);
+          
+          console.log('Exames laboratoriais extraídos:', examesLaboratoriais);
+          
+          // Verificar se há algum dado de laboratorial para salvar
+          const hasLabData = Object.values(examesLaboratoriais).some(val => 
+            val !== null && val !== undefined && val !== ''
+          );
+          
+          console.log('Tem dados laboratoriais?', hasLabData);
+          
+          if (hasLabData) {
+            console.log('Salvando laboratoriais para paciente:', savedPatientId);
+            const { error: labError } = await saveExamesLaboratoriais(
+              savedPatientId, 
+              examesLaboratoriais
+            );
+            
+            if (labError) {
+              console.error('Erro ao salvar laboratoriais:', labError);
+              // Não falhar completamente, apenas logar o erro
+            } else {
+              console.log('Laboratoriais salvos com sucesso para paciente:', pacienteNormalizado.nome);
+            }
+          } else {
+            console.log('Nenhum dado laboratorial encontrado para salvar');
+          }
+        } catch (labError) {
+          console.error('Erro na extração de laboratoriais:', labError);
+          // Não falhar completamente, apenas logar o erro
         }
         setProgress(Math.round(((i + 1) / total) * 100));
       }
