@@ -218,6 +218,14 @@ Formate datas como DD/MM/AAAA.` }
     // Extract the exames_laboratoriais object
     const examesData = parsedData.exames_laboratoriais || {};
     
+    console.log('=== DEBUG DOS DADOS EXTRAÍDOS ===');
+    console.log('examesData bruto:', examesData);
+    
+    // Log each field value for debugging
+    Object.keys(examesData).forEach(key => {
+      console.log(`${key}:`, examesData[key], `(tipo: ${typeof examesData[key]})`);
+    });
+    
     // Sanitize and normalize data
     const sanitizedData: Partial<ExamesLaboratoriais> = {
       data_lab_pre: (typeof examesData.data_lab_pre === 'string' ? examesData.data_lab_pre.trim() : '') || '',
@@ -244,6 +252,18 @@ Formate datas como DD/MM/AAAA.` }
       albumina_pre: isValidLabValue(examesData.albumina_pre, 'albumina_pre') ? examesData.albumina_pre : undefined,
       insulina_pre: isValidLabValue(examesData.insulina_pre, 'insulina_pre') ? examesData.insulina_pre : undefined
     };
+    
+    console.log('=== DEBUG DOS DADOS SANITIZADOS ===');
+    console.log('sanitizedData:', sanitizedData);
+    
+    // Check what was rejected
+    Object.keys(examesData).forEach(key => {
+      const originalValue = examesData[key];
+      const sanitizedValue = sanitizedData[key as keyof typeof sanitizedData];
+      if (originalValue !== null && originalValue !== undefined && sanitizedValue === undefined) {
+        console.log(`⚠️ Valor rejeitado para ${key}:`, originalValue, '(motivo: isValidLabValue)');
+      }
+    });
 
     // Normalizar datas para formato DD/MM/YYYY
     const dadosNormalizados = normalizarDatasPaciente(sanitizedData);
