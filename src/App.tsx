@@ -435,7 +435,7 @@ export default function App() {
         let savedPatientId = pacienteNormalizado.id;
         
         if (isSupabaseConfigured()) {
-          const { error } = await supabase
+          const { data, error } = await supabase
             .from('patients')
             .insert([{
               num: pacienteParaBanco.num,
