@@ -16,7 +16,7 @@ const isValidLabValue = (value: any, fieldName?: string): boolean => {
   if (isNaN(value)) return false;
   
   // Aceitar -1 e -2 como "não encontrado" ou "não realizado"
-  if (value === -1 || value === -2) return true; // -1/-2 significa não encontrado, salvar como undefined
+  if (value === -1 || value === -2) return false; // -1/-2 significa não encontrado, não salvar (deixa undefined)
   
   // Não pode ser valores inválidos comuns (exceto -1 que já foi tratado)
   if (value === -0.5 || value === 0 && value !== 0) return false;
