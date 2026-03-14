@@ -271,11 +271,26 @@ Formate datas como DD/MM/AAAA.` }
         console.log(`⚠️ Valor rejeitado para ${key}:`, originalValue, '(motivo: isValidLabValue)');
       }
     });
+    
+    // Log final dos dados que serão salvos
+    console.log('=== DADOS FINAIS PARA SALVAR ===');
+    const dadosFinais = normalizarDatasPaciente(sanitizedData);
+    console.log('dadosFinais:', dadosFinais);
+    
+    // Verificar se ainda há -1 nos dados finais
+    const hasMenos1 = Object.values(dadosFinais).some(val => val === -1);
+    if (hasMenos1) {
+      console.error('🚨 ATENÇÃO: Ainda há valores -1 nos dados finais!');
+      Object.keys(dadosFinais).forEach(key => {
+        if (dadosFinais[key as keyof typeof dadosFinais] === -1) {
+          console.error(`❌ -1 encontrado em: ${key}`);
+        }
+      });
+    } else {
+      console.log('✅ Nenhum valor -1 encontrado nos dados finais');
+    }
 
-    // Normalizar datas para formato DD/MM/YYYY
-    const dadosNormalizados = normalizarDatasPaciente(sanitizedData);
-
-    return dadosNormalizados;
+    return dadosFinais;
 
   } catch (error: any) {
     console.error('Erro detalhado na extração de exames laboratoriais:', {
