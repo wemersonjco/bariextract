@@ -156,7 +156,7 @@ export default function App() {
   }
 
   // Load patients from Supabase
-  React.useEffect(() => {
+  useEffect(() => {
     const loadPatients = async () => {
       console.log('Iniciando loadPatients...');
       console.log('isSupabaseConfigured:', isSupabaseConfigured());
