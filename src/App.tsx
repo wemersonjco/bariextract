@@ -276,16 +276,6 @@ export default function App() {
     }
   };
 
-  // Se estiver carregando, mostrar loading
-  if (loading) {
-    return <Loading />;
-  }
-
-  // Se não houver usuário logado, mostrar tela de login
-  if (!user) {
-    return <Login onLogin={setUser} />;
-  }
-
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const newFiles: { data: string, mimeType: string, name: string }[] = [];
     let filesProcessed = 0;
@@ -325,6 +315,16 @@ export default function App() {
     accept: { 'text/plain': ['.txt'], 'application/pdf': ['.pdf'] },
     multiple: true 
   });
+
+  // Se estiver carregando, mostrar loading
+  if (loading) {
+    return <Loading />;
+  }
+
+  // Se não houver usuário logado, mostrar tela de login
+  if (!user) {
+    return <Login onLogin={setUser} />;
+  }
 
   const handleProcess = async () => {
     console.log('=== handleProcess iniciado ===');
