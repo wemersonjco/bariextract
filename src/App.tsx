@@ -135,26 +135,6 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Função de logout
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      setUser(null);
-    } catch (error) {
-      console.error('Erro ao fazer logout:', error);
-    }
-  };
-
-  // Se estiver carregando, mostrar loading
-  if (loading) {
-    return <Loading />;
-  }
-
-  // Se não houver usuário logado, mostrar tela de login
-  if (!user) {
-    return <Login onLogin={setUser} />;
-  }
-
   // Load patients from Supabase
   useEffect(() => {
     const loadPatients = async () => {
@@ -285,6 +265,26 @@ export default function App() {
     };
     loadPatients();
   }, []);
+
+  // Função de logout
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      setUser(null);
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
+  };
+
+  // Se estiver carregando, mostrar loading
+  if (loading) {
+    return <Loading />;
+  }
+
+  // Se não houver usuário logado, mostrar tela de login
+  if (!user) {
+    return <Login onLogin={setUser} />;
+  }
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const newFiles: { data: string, mimeType: string, name: string }[] = [];
