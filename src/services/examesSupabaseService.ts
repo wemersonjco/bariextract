@@ -4,7 +4,14 @@ import { ExamesLaboratoriais, PatientData } from '../types';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export const supabase: SupabaseClient = createClient(supabaseUrl || '', supabaseAnonKey || '');
+export const supabase: SupabaseClient = createClient(supabaseUrl || '', supabaseAnonKey || '', {
+  auth: {
+    persistSession: true,
+    storage: localStorage,
+    autoRefreshToken: true,
+    detectSessionInUrl: true
+  }
+});
 
 export const isSupabaseConfigured = (): boolean => {
   return !!(supabaseUrl && supabaseAnonKey);

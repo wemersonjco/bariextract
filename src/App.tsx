@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { 
   Upload, 
   FileText, 
@@ -30,7 +30,8 @@ import {
   History,
   Calendar,
   BarChart3,
-  TrendingUp
+  TrendingUp,
+  LogOut
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import * as XLSX from 'xlsx';
@@ -63,6 +64,8 @@ import {
   supabase
 } from './services/examesSupabaseService';
 import ExtraçãoComplementar from './components/ExtraçãoComplementar';
+import Login from './components/Login';
+import Loading from './components/Loading';
 
 ChartJS.register(
   ArcElement, 
@@ -79,6 +82,11 @@ ChartJS.register(
 type Tab = 'dashboard' | 'patients';
 
 export default function App() {
+  // Estados de autenticação
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Estados existentes
   const [activeTab, setActiveTab] = useState<Tab>('patients');
   const [patients, setPatients] = useState<PatientData[]>([]);
   const [isEditing, setIsEditing] = useState(false);
@@ -95,6 +103,57 @@ export default function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showExtraçãoComplementar, setShowExtraçãoComplementar] = useState(false);
   const [extractionMode, setExtractionMode] = useState<'completa' | 'complementar'>('completa');
+
+  // Verificar sessão ao carregar o app
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Erro ao verificar sessão:', error);
+          setUser(null);
+        } else {
+          setUser(session?.user || null);
+        }
+      } catch (err) {
+        console.error('Erro inesperado ao verificar sessão:', err);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkSession();
+
+    // Escutar mudanças de autenticação
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Função de logout
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      setUser(null);
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
+  };
+
+  // Se estiver carregando, mostrar loading
+  if (loading) {
+    return <Loading />;
+  }
+
+  // Se não houver usuário logado, mostrar tela de login
+  if (!user) {
+    return <Login onLogin={setUser} />;
+  }
 
   // Load patients from Supabase
   React.useEffect(() => {
@@ -1286,6 +1345,26 @@ export default function App() {
             <div className="flex items-center gap-2 px-3 py-1 bg-emerald-50 rounded-full">
               <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
               <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">IA Ativa</span>
+            </div>
+            
+            {/* User info and logout */}
+            <div className="flex items-center gap-3 pl-4 border-l border-gray-200">
+              <div className="flex flex-col items-end">
+                <span className="text-sm font-medium text-gray-900">
+                  {user?.email}
+                </span>
+                <span className="text-xs text-gray-500">
+                  Online
+                </span>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                title="Sair"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Sair</span>
+              </button>
             </div>
           </div>
         </header>
